@@ -1,0 +1,295 @@
+\User declarations :
+
+#include <vector>
+#include <map>
+#include <cstdarg>
+
+/* ---------------------------------------------------------------------------------
+										Data
+--------------------------------------------------------------------------------- */
+
+template <typename T>
+void variadic_vector_emplace(std::vector<T>&) {}
+
+template <typename T, typename First, typename... Args>
+void variadic_vector_emplace(std::vector<T>& v, First&& first, Args&&... args)
+{
+	v.emplace_back(std::forward<First>(first));
+	variadic_vector_emplace(v, std::forward<Args>(args)...);
+}
+
+/* ---------------------------
+		Day
+--------------------------- */
+
+enum DAY
+{
+	MONDAY,
+	TUESDAY,
+	WEDNESDAY,
+	THURSDAY,
+	FRIDAY
+};
+
+/* ---------------------------
+		Time slots
+--------------------------- */
+
+enum SLOT
+{
+	SLOT_0,
+	SLOT_1,
+	SLOT_2,
+	SLOT_3
+};
+
+/* ---------------------------
+		Class
+--------------------------- */
+
+enum CLASS
+{
+	L0_SPE_A_1,
+	L0_SPE_A_2,
+	L0_SPE_B_1,
+	L0_SPE_B_2,
+	L0_SPE_C_1,
+	L0_SPE_C_2,
+	L0_SPE_D_1,
+	L0_SPE_D_2,
+	L1_SPE_A_1,
+	L1_SPE_A_2,
+	L2_SPE_B_1,
+	L2_SPE_B_2,
+	L3_SPE_C_1,
+	L3_SPE_C_2,
+	L4_SPE_D_1,
+	L4_SPE_D_2
+};
+
+/* ---------------------------
+		Teachers
+--------------------------- */
+
+class Teacher
+{
+
+public:
+
+	static void addTeacher(const Teacher& _teacher)
+	{
+		s_teacher.push_back(_teacher);
+	}
+
+private:
+
+	static std::vector<Teacher> s_teacher;
+
+public:
+
+	enum TEACHERS_TYPE
+	{
+		MATHS,
+		PHYSICS,
+		COMPUTERS,
+		CHEMISTRY,
+		ENGLISH,
+		FRENCH
+	};
+
+	Teacher(TEACHERS_TYPE _type)
+		: m_type(_type)
+	{
+
+		for(int i=0 ; i<5 ; ++i)
+		{
+			for(int j=0 ; j<4 ; ++j)
+			{
+				m_availability[(DAY)i][(SLOT)j] = true;
+			}
+		}
+	}
+
+private:
+
+	TEACHERS_TYPE m_type;
+	std::map<DAY, std::map<SLOT, bool>> m_availability;
+
+};
+
+/* ---------------------------
+		Room
+--------------------------- */
+
+class Room
+{
+
+public:
+
+	static void addRoom(const Room& _room)
+	{
+		s_rooms.push_back(_room);
+	}
+
+private:
+
+	static std::vector<Room> s_rooms;
+
+public:
+
+	enum ROOM_TYPE
+	{
+		ROOM,
+		AMPHI,
+		LANGUAGE,
+		CONPUTER,
+		LABORATORY
+	};
+
+	Room(ROOM_TYPE _type, unsigned short _capacity)
+		:	m_type(_type),
+			m_capacity(_capacity)
+	{
+	}
+
+private:
+
+	ROOM_TYPE m_type;
+	unsigned short m_capacity;
+
+};
+
+/* ---------------------------------------------------------------------------------
+										Schedules
+--------------------------------------------------------------------------------- */
+
+/* ---------------------------
+		Lesson
+--------------------------- */
+
+class Lesson
+{
+
+public:
+
+	template <typename... Args>
+	Lesson(const Teacher& _teacher, const Room& _room, Args&&... _class)
+		: 	m_teacher(_teacher),
+			m_room(_room)
+	{
+		variadic_vector_emplace(m_class, std::forward<Args>(_class)...);
+	}
+
+private:
+
+	const Teacher& m_teacher;
+	const Room& m_room;
+	std::vector<CLASS> m_class;
+
+};
+
+/* ---------------------------
+		Day
+--------------------------- */
+
+class Day
+{
+
+public:
+
+	Day(DAY _day)
+		:	m_day(_day)
+	{
+	}
+
+private:
+
+	DAY m_day;
+	std::map<SLOT, std::vector<Lesson>> m_lessons;
+
+};
+
+\end
+
+\User functions:
+\end
+
+\User CUDA:
+\end
+
+\Before everything else function:
+	Teacher t(Teacher::MATHS);
+	Room r(Room::ROOM, 100);
+	Lesson(t, r, L0_SPE_A_1, L0_SPE_A_2, L4_SPE_D_1);
+\end
+
+\After everything else function:
+\end
+
+\At the beginning of each generation function:
+\end
+
+\At the end of each generation function:
+\end
+
+\At each generation before reduce function:
+\end
+
+\User classes :
+	GenomeClass { 
+		float sin[3];
+	}
+\end
+
+\GenomeClass::display:
+\end
+
+\GenomeClass::initialiser :
+\end
+
+\GenomeClass::crossover :
+\end
+
+\GenomeClass::mutator:
+  	return 1;
+\end
+
+\GenomeClass::evaluator:
+	return 1;
+\end
+
+\User Makefile options:
+	  CPPFLAGS += -std=c++11
+\end
+
+\Default run parameters :         // Please let the parameters appear in this order
+Number of generations : 300       // NB_GEN
+Time limit: 0                     // In seconds, 0 to deactivate
+Population size : 65536           // POP_SIZE
+Offspring size : 100%             // 40% 
+Mutation probability : 1          // MUT_PROB
+Crossover probability : 1         // XOVER_PROB
+Evaluator goal : minimise         // Maximise
+Selection operator: Tournament 2 
+Surviving parents: 100%           // percentage or absolute
+Surviving offspring: 100%
+Reduce parents operator: Tournament 2
+Reduce offspring operator: Tournament 2
+Final reduce operator: Tournament 3
+
+Elitism: Weak                     // Weak or Strong
+Elite: 1
+Print stats: true                 // Default: 1
+Generate csv stats file:false
+Generate gnuplot script:false
+Generate R script:false
+Plot stats:true                   // Default: 0
+
+Remote island model: true
+IP file: ipexplorer.txt           // File containing all the remote island's IP
+Server port : 2929
+Migration probability: 0.15       // 0.15 or 0.5
+
+Save population: false
+Start from file:false
+\end
