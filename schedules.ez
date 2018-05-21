@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include <cstdarg>
+#include <algorithm>
 
 #include "Teacher.h"
 #include "Room.h"
@@ -13,9 +14,15 @@
 										Schedules
 --------------------------------------------------------------------------------- */
 
+static const unsigned short WEEK_BY_SEMESTER = 14;
+static const unsigned short MAX_HOUR_PER_WEEK = 30;
+static const unsigned short MAX_HOUR_PER_DAY = 6; 
+
 /* ---------------------------
 		Day
 --------------------------- */
+
+static const unsigned short DAY_SIZE = 5;
 
 enum DAY
 {
@@ -29,6 +36,10 @@ enum DAY
 /* ---------------------------
 		Time slots
 --------------------------- */
+
+static const float SLOT_INTERVAL = 1.5;
+
+static const unsigned short SLOT_SIZE = 4;
 
 enum SLOT
 {
@@ -56,7 +67,7 @@ public:
 	{
 	}
 
-private:
+public:
 
 	const std::string m_UEname;
 
@@ -79,6 +90,106 @@ typedef std::map<int, Week> Schedules;
 \end
 
 \User functions:
+
+bool TeacherBusy(const Day& _day, const SLOT _slot, const Teacher& _teacher)
+{
+	for(const Lesson& lesson : _day.at(_slot))
+	{
+		if(&lesson.m_teacher == &_teacher)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool RoomBusy(const Day& _day, const SLOT _slot, const Room& _room)
+{
+	for(const Lesson& lesson : _day.at(_slot))
+	{
+		if(&lesson.m_room == &_room)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool ClassBusy(const Day& _day, const SLOT _slot, const Class& _class)
+{
+	for(const Lesson& lesson : _day.at(_slot))
+	{
+		for(const Class& t_class : lesson.m_class)
+		{
+			if(&t_class == &_class)
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+int getRandomSubject(Subject::SUBJECT_SEMESTER _semester, float (*_totalCount)[4])
+{
+	unsigned short offset = 0;
+	unsigned short count = 0;
+	switch(_semester)
+	{
+		case Subject::S1:
+			offset = Subject::s_s1Offset;
+			count = Subject::s_s1Count;
+		break;
+		case Subject::S2:
+			offset = Subject::s_s2Offset;
+			count = Subject::s_s2Count;		
+		break;
+		case Subject::S3:
+			offset = Subject::s_s3Offset;
+			count = Subject::s_s3Count;		
+		break;
+		case Subject::S4:
+			offset = Subject::s_s4Offset;
+			count = Subject::s_s4Count;
+		break;
+	}
+
+	std::vector<unsigned> alreadyUsed;
+	while(alreadyUsed.size()!=count)
+	{
+		unsigned rand = random(offset, offset+count);
+
+		if (std::find(alreadyUsed.begin(), alreadyUsed.end(), rand) != alreadyUsed.end())
+		{
+			continue;
+		}
+		alreadyUsed.push_back(rand);
+
+		const Subject& result = Subject::s_subjects[rand];
+		for (unsigned short _modality = 0; _modality < Subject::SUBJECT_MODALITY_SIZE; _modality++)
+		{
+			if( result.m_modality.at(static_cast<Subject::SUBJECT_MODALITY>(_modality)) > _totalCount[rand][_modality])
+			{
+				return rand;
+			}
+		}
+	}
+	return -1;
+}
+
+Subject::SUBJECT_MODALITY getSubjectFreeType(int _subjectIndex, float (*_totalCount)[4])
+{
+	const Subject& subject = Subject::s_subjects[_subjectIndex]; 
+	while(true)
+	{
+		unsigned rand = random(0,4);
+		if(subject.m_modality.at(static_cast<Subject::SUBJECT_MODALITY>(rand)) > _totalCount[_subjectIndex][rand])
+		{
+			return static_cast<Subject::SUBJECT_MODALITY>(rand);
+		}
+	}
+}
+
 \end
 
 \User CUDA:
@@ -121,7 +232,7 @@ typedef std::map<int, Week> Schedules;
 
 \User classes :
 	GenomeClass { 
-		int* m_schedules;	// This is a HACK
+		int* m_schedules;	// This is a HACK, it will be changed to void*.
 	}
 \end
 
@@ -129,6 +240,52 @@ typedef std::map<int, Week> Schedules;
 \end
 
 \GenomeClass::initialiser:
+	/*
+	typedef std::map<SLOT, std::vector<Lesson>> Day;
+	typedef std::map<DAY, Day> Week;
+	typedef std::map<int, Week> Schedules;
+	*/
+	float totalHour[Subject::s_subjects.size()][4];
+    #pragma omp parallel for shared(totalHour)
+	for(unsigned int i=0 ; i<Subject::s_subjects.size(); ++i)
+	{
+		for(unsigned int j=0 ; j<4 ; ++j)
+		{
+			totalHour[i][j] = 0.f;
+		}
+	}
+
+	Schedules* schedules = new Schedules();
+
+	// First semester
+	for(unsigned short _week = 0; _week < WEEK_BY_SEMESTER; ++_week)
+	{
+		Week week;
+		for(unsigned short _day = 0; _day < DAY_SIZE; ++_day)
+		{
+			Day day;
+			for(unsigned short _slot = 0; _slot < SLOT_SIZE; ++_slot)
+			{
+				int subjectIndex = getRandomSubject(Subject::S1, totalHour);
+				if(subjectIndex != -1)
+				{
+					Subject::SUBJECT_MODALITY modality = getSubjectFreeType(subjectIndex, totalHour);
+					totalHour[subjectIndex][modality] += SLOT_INTERVAL;
+
+					//TODO
+					std::cout << "{" << _week << " " << _day << " " << _slot << "} "<< subjectIndex << " " << modality << std::endl;
+				}
+				else
+				{
+
+				}
+			}
+			week[static_cast<DAY>(_day)] = day;
+		}
+		(*schedules)[_week] = week;
+	}
+
+	Genome.m_schedules = (void*)schedules;
 \end
 
 \GenomeClass::crossover:
