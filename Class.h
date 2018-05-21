@@ -41,14 +41,6 @@ public:
 
 public:
 
-	void display() const;
-
-private:
-
-	Class(CLASS_YEAR, CLASS_SPE, CLASS_GROUP, short);
-
-private:
-
 	const CLASS_YEAR m_year;
 
 	const CLASS_SPE m_spe;
@@ -56,6 +48,14 @@ private:
 	const CLASS_GROUP m_group;
 
 	const short m_students;
+
+public:
+
+	void display() const;
+
+private:
+
+	Class(CLASS_YEAR, CLASS_SPE, CLASS_GROUP, short);
 
 };
 

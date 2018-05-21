@@ -63,15 +63,6 @@ public:
 
 public:
 
-	void display() const;
-
-private:
-
-	template <typename... Args>
-	Teacher(TEACHERS_TYPE, TEACHERS_TIME, const std::string&, Args&&...);
-
-private:
-
 	const TEACHERS_TYPE m_type;
 
 	const TEACHERS_TIME m_time;
@@ -79,6 +70,15 @@ private:
 	const std::string m_name;
 
 	std::map<TEACHERS_DAY, std::map<TEACHERS_SLOT, bool>> m_availability;
+
+public:
+
+	void display() const;
+
+private:
+
+	template <typename... Args>
+	Teacher(TEACHERS_TYPE, TEACHERS_TIME, const std::string&, Args&&...);
 
 };
 

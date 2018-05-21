@@ -38,14 +38,6 @@ public:
 	};
 
 public:
-
-	void display() const;
-
-private:
-
-	Subject(const std::string&, SUBJECT_SEMESTER, SUBJECT_SPECIALITY, unsigned short, unsigned short, unsigned short, unsigned short);
-	
-private:
 	
 	const std::string m_name;
 
@@ -60,6 +52,14 @@ private:
 	const unsigned short m_nbHoursTD;
 
 	const unsigned short m_nbHoursTP;
+
+public:
+
+	void display() const;
+
+private:
+
+	Subject(const std::string&, SUBJECT_SEMESTER, SUBJECT_SPECIALITY, unsigned short, unsigned short, unsigned short, unsigned short);
 
 };
 

@@ -30,17 +30,17 @@ public:
 
 public:
 
+	const ROOM_TYPE m_type;
+
+	const unsigned short m_capacity;
+
+public:
+
 	void display() const;
 
 private:
 
 	Room(ROOM_TYPE, unsigned short);
-
-private:
-
-	const ROOM_TYPE m_type;
-
-	const unsigned short m_capacity;
 
 };
 

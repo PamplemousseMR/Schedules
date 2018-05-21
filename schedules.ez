@@ -121,17 +121,17 @@ typedef std::map<int, Week> Schedules;
 
 \User classes :
 	GenomeClass { 
-		float sin[3];
+		int* m_schedules;	// This is a HACK
 	}
 \end
 
 \GenomeClass::display:
 \end
 
-\GenomeClass::initialiser :
+\GenomeClass::initialiser:
 \end
 
-\GenomeClass::crossover :
+\GenomeClass::crossover:
 \end
 
 \GenomeClass::mutator:
