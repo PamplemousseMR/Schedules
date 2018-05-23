@@ -18,22 +18,6 @@ public:
 	
 	static const std::vector<Subject> s_subjects;
 
-	static unsigned short s_s1Count;
-
-	static unsigned short s_s1Offset;
-
-	static unsigned short s_s2Count;
-
-	static unsigned short s_s2Offset;
-
-	static unsigned short s_s3Count;
-
-	static unsigned short s_s3Offset;
-
-	static unsigned short s_s4Count;
-
-	static unsigned short s_s4Offset;
-
 public:
 	
 	enum SUBJECT_SPECIALITY
@@ -63,8 +47,6 @@ public:
 		FRENCH,
 		UNDEFINED
 	};
-
-	static const unsigned short SUBJECT_MODALITY_SIZE;
 
 	enum SUBJECT_MODALITY
 	{
@@ -158,24 +140,6 @@ const std::vector<Subject> Subject::s_subjects
 	Subject("UE406c", S4, OILNGAS, PHYSICS, 30, 0, 30, 21),
 	Subject("UE411", S4, OILNGAS, PHYSICS, 15, 0, 6, 9)
 };
-
-unsigned short Subject::s_s1Count = 7;
-
-unsigned short Subject::s_s1Offset = 0;
-
-unsigned short Subject::s_s2Count = 8;
-
-unsigned short Subject::s_s2Offset = s_s1Count;
-
-unsigned short Subject::s_s3Count = 15;
-
-unsigned short Subject::s_s3Offset = s_s2Offset+s_s2Count;
-
-unsigned short Subject::s_s4Count = 14;
-
-unsigned short Subject::s_s4Offset = s_s3Offset+s_s3Count;
-
-const unsigned short Subject::SUBJECT_MODALITY_SIZE = 4;
 
 Subject::Subject(const std::string& _name, SUBJECT_SEMESTER _semester, SUBJECT_SPECIALITY _speciality, SUBJECT_TYPE _type, 
 		unsigned short _cm, unsigned short _ci, unsigned short _td, unsigned short _tp)

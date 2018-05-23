@@ -17,8 +17,6 @@ public:
 
 	static const std::vector<Class> s_class;
 
-	static const short CLASS_YEAR_SIZE;
-
 public:
 
 	enum CLASS_YEAR
@@ -84,8 +82,6 @@ const std::vector<Class> Class::s_class
 	Class(L1, SPE_D, A, 20),
 	Class(L1, SPE_D, B, 20)
 };
-
-const short Class::CLASS_YEAR_SIZE = 2;
 
 Class::Class(CLASS_YEAR _year, CLASS_SPE _spe, CLASS_GROUP _group, short _students)
 	:	m_year(_year),

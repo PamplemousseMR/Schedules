@@ -23,6 +23,14 @@ typedef std::map<Lesson::LESSON_SLOT, std::vector<Lesson>> Day;
 typedef std::map<Lesson::LESSON_DAY, Day> Week;
 typedef std::map<int, Week> Schedules; 
 
+typedef struct Tuple_t
+{
+	int m_week;
+	const Room& m_room;
+	Lesson::LESSON_DAY m_day;
+	Lesson::LESSON_SLOT m_slot;
+} Tuple;
+
 \end
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -30,7 +38,7 @@ typedef std::map<int, Week> Schedules;
 
 \User functions:
 
-bool TeacherBusy(const Day& _day, const Lesson::LESSON_SLOT _slot, const Teacher& _teacher)
+bool teacherBusy(const Day& _day, const Lesson::LESSON_SLOT _slot, const Teacher& _teacher)
 {
 	for(const Lesson& lesson : _day.at(_slot))
 	{
@@ -42,7 +50,7 @@ bool TeacherBusy(const Day& _day, const Lesson::LESSON_SLOT _slot, const Teacher
 	return false;
 }
 
-bool RoomBusy(const Day& _day, const Lesson::LESSON_SLOT _slot, const Room& _room)
+bool roomBusy(const Day& _day, const Lesson::LESSON_SLOT _slot, const Room& _room)
 {
 	for(const Lesson& lesson : _day.at(_slot))
 	{
@@ -54,7 +62,7 @@ bool RoomBusy(const Day& _day, const Lesson::LESSON_SLOT _slot, const Room& _roo
 	return false;
 }
 
-bool ClassBusy(const Day& _day, const Lesson::LESSON_SLOT _slot, const Class& _class)
+bool classBusy(const Day& _day, const Lesson::LESSON_SLOT _slot, const Class& _class)
 {
 	for(const Lesson& lesson : _day.at(_slot))
 	{
@@ -69,64 +77,24 @@ bool ClassBusy(const Day& _day, const Lesson::LESSON_SLOT _slot, const Class& _c
 	return false;
 }
 
-int getRandomSubject(Subject::SUBJECT_SEMESTER _semester, float (*_totalCount)[4])
+template<typename T>
+std::vector<T> shuffleVector(const std::vector<T>& _vec)
 {
-	unsigned short offset = 0;
-	unsigned short count = 0;
-	switch(_semester)
+	std::vector<size_t> value;
+	for(size_t i=0 ; i<_vec.size() ; ++i)	
 	{
-		case Subject::S1:
-			offset = Subject::s_s1Offset;
-			count = Subject::s_s1Count;
-		break;
-		case Subject::S2:
-			offset = Subject::s_s2Offset;
-			count = Subject::s_s2Count;		
-		break;
-		case Subject::S3:
-			offset = Subject::s_s3Offset;
-			count = Subject::s_s3Count;		
-		break;
-		case Subject::S4:
-			offset = Subject::s_s4Offset;
-			count = Subject::s_s4Count;
-		break;
+		value.push_back(i);
 	}
 
-	std::vector<unsigned> alreadyUsed;
-	while(alreadyUsed.size()!=count)
+	std::vector<T> result;
+	while(!value.empty())
 	{
-		unsigned rand = random(offset, offset+count);
-
-		if (std::find(alreadyUsed.begin(), alreadyUsed.end(), rand) != alreadyUsed.end())
-		{
-			continue;
-		}
-		alreadyUsed.push_back(rand);
-
-		const Subject& result = Subject::s_subjects[rand];
-		for (unsigned short _modality = 0; _modality < Subject::SUBJECT_MODALITY_SIZE; _modality++)
-		{
-			if( result.m_modality.at(static_cast<Subject::SUBJECT_MODALITY>(_modality)) > _totalCount[rand][_modality])
-			{
-				return rand;
-			}
-		}
+		unsigned rand = random(0, value.size());
+		result.push_back(_vec[value[rand]]);
+		value.erase(value.begin()+rand);
 	}
-	return -1;
-}
 
-Subject::SUBJECT_MODALITY getSubjectFreeType(int _subjectIndex, float (*_totalCount)[4])
-{
-	const Subject& subject = Subject::s_subjects[_subjectIndex]; 
-	while(true)
-	{
-		unsigned rand = random(0,4);
-		if(subject.m_modality.at(static_cast<Subject::SUBJECT_MODALITY>(rand)) > _totalCount[_subjectIndex][rand])
-		{
-			return static_cast<Subject::SUBJECT_MODALITY>(rand);
-		}
-	}
+	return result;
 }
 
 \end
@@ -206,54 +174,95 @@ Subject::SUBJECT_MODALITY getSubjectFreeType(int _subjectIndex, float (*_totalCo
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
 \GenomeClass::initialiser:
-	/*
-	typedef std::map<SLOT, std::vector<Lesson>> Day;
-	typedef std::map<DAY, Day> Week;
-	typedef std::map<int, Week> Schedules;
-	*/
-	float totalSubjectHour[Subject::s_subjects.size()][4];
-    #pragma omp parallel for shared(totalSubjectHour)
-	for(unsigned int i=0 ; i<Subject::s_subjects.size(); ++i)
-	{
-		for(unsigned int j=0 ; j<4 ; ++j)
-		{
-			totalSubjectHour[i][j] = 0.f;
-		}
-	}
 
 	Schedules* schedules = new Schedules();
 
-	// First semester
-	for(unsigned short _week = 0; _week < WEEK_BY_SEMESTER; ++_week)
+	std::vector<Subject> sub_shuffle;
+	for(unsigned i = 0; i < Subject::s_subjects.size(); ++i)
 	{
-		Week week;
-		for(unsigned short _day = 0; _day < Lesson::DAY_SIZE; ++_day)
+		const Subject& subject = Subject::s_subjects.at(i);
+		float number = subject.m_modality.at(Subject::CM)/Lesson::SLOT_INTERVAL; 
+		for(float j = 0.; j < number; j++)
 		{
-			Day day;
-			for(unsigned short _slot = 0; _slot < Lesson::SLOT_SIZE; ++_slot)
-			{
-				int subjectIndex = getRandomSubject(Subject::S1, totalSubjectHour);
-				if(subjectIndex != -1)
-				{
-					Subject::SUBJECT_MODALITY modality = getSubjectFreeType(subjectIndex, totalSubjectHour);
-					totalSubjectHour[subjectIndex][modality] += Lesson::SLOT_INTERVAL;
-
-					//TODO
-					std::cout << "{" << _week << " " << _day << " " << _slot << "} "<< subjectIndex << " " << modality << std::endl;
-				}
-				else
-				{
-
-				}
-			}
-			week[static_cast<Lesson::LESSON_DAY>(_day)] = day;
+			sub_shuffle.push_back(subject);
 		}
-		(*schedules)[_week] = week;
 	}
 
-	for(int i=0 ; i<Subject::s_subjects.size() ; ++i)
+  	sub_shuffle = shuffleVector(sub_shuffle);
+
+  	std::vector<Tuple> tup_shuffle_first;
+  	std::vector<Tuple> tup_shuffle_second;
+  	for(unsigned i = Room::s_amphiOffset; i < Room::s_amphiCount; ++i)
+  	{
+  		for(unsigned short _week = 0; _week < WEEK_BY_SEMESTER; ++_week)
+		{
+			for(unsigned short _day = 0; _day < Lesson::DAY_SIZE; ++_day)
+			{
+				for(unsigned short _slot = 0; _slot < Lesson::SLOT_SIZE; ++_slot)
+				{
+					{
+						Tuple tuple {_week, Room::s_rooms[i], static_cast<Lesson::LESSON_DAY>(_day), static_cast<Lesson::LESSON_SLOT>(_slot)};
+						tup_shuffle_first.push_back(tuple);
+					}
+					{
+						Tuple tuple {_week+WEEK_BY_SEMESTER, Room::s_rooms[i], static_cast<Lesson::LESSON_DAY>(_day), static_cast<Lesson::LESSON_SLOT>(_slot)};
+						tup_shuffle_second.push_back(tuple);
+					}
+				}
+			}
+		}
+  	} 
+
+  	tup_shuffle_first = shuffleVector(tup_shuffle_first);
+  	tup_shuffle_second = shuffleVector(tup_shuffle_second);
+
+  	//TODO
+  	const Teacher& t = Teacher::s_teachers[0];
+
+  	for(const Subject& sub : sub_shuffle)
+  	{
+  		std::vector<Tuple>* tup_suffle;
+  		std::initializer_list<Class> classes;
+  		switch (sub.m_semester) {
+  			case(Subject::S1) : 
+  				tup_suffle = &tup_shuffle_first;
+  				classes = {Class::s_class[0], Class::s_class[1], Class::s_class[2], Class::s_class[3], Class::s_class[4], Class::s_class[5], Class::s_class[6], Class::s_class[7]};
+  				break;
+  			case(Subject::S2) : 
+  				tup_suffle = &tup_shuffle_second;
+  				classes = {Class::s_class[0], Class::s_class[1], Class::s_class[2], Class::s_class[3], Class::s_class[4], Class::s_class[5], Class::s_class[6], Class::s_class[7]};
+  				break;
+  			case(Subject::S3) : 
+  				tup_suffle = &tup_shuffle_first;	
+  				classes = {Class::s_class[8], Class::s_class[9], Class::s_class[10], Class::s_class[11], Class::s_class[12], Class::s_class[13], Class::s_class[14], Class::s_class[15]};
+  				break;  
+  			case(Subject::S4) : 
+  				tup_suffle = &tup_shuffle_second;
+  				classes = {Class::s_class[8], Class::s_class[9], Class::s_class[10], Class::s_class[11], Class::s_class[12], Class::s_class[13], Class::s_class[14], Class::s_class[15]};
+  				break;
+  		}
+  		const Tuple& tuple = (*tup_suffle).back();
+  		(*tup_suffle).pop_back();
+  		(*schedules)[tuple.m_week][tuple.m_day][tuple.m_slot].emplace_back(Lesson(sub.m_name, t, tuple.m_room, classes));
+  	}
+
+
+	// TODO
+	for(unsigned short _week = 0; _week < WEEK_BY_SEMESTER*2; ++_week)
 	{
-		std::cout << totalSubjectHour[i][0] << " " << totalSubjectHour[i][1] << " " << totalSubjectHour[i][2] << " " << totalSubjectHour[i][3] << std::endl; 
+		for(unsigned short _day = 0; _day < Lesson::DAY_SIZE; ++_day)
+		{
+			for(unsigned short _slot = 0; _slot < Lesson::SLOT_SIZE; ++_slot)
+			{
+				std::cout << _week << " " << _day << " " << _slot << "\n\t";
+				auto vec = (*schedules)[_week][static_cast<Lesson::LESSON_DAY>(_day)][static_cast<Lesson::LESSON_SLOT>(_slot)];
+				for(const Lesson& lesson : vec)
+				{
+					std::cout << "{" << lesson.m_UEname << " " << &lesson.m_room << "} "; 
+				}
+				std::cout << std::endl;
+			}
+		}
 	}
 
 	exit(0);

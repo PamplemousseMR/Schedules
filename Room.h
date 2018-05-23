@@ -17,6 +17,10 @@ public:
 
 	static const std::vector<Room> s_rooms;
 
+	static unsigned short s_amphiCount;
+
+	static unsigned short s_amphiOffset;
+
 public:
 
 	enum ROOM_TYPE
@@ -73,6 +77,10 @@ const std::vector<Room> Room::s_rooms
 	Room(LABORATORY, 20),
 	Room(LABORATORY, 20)
 };
+
+unsigned short Room::s_amphiCount = 2;
+
+unsigned short Room::s_amphiOffset = 0;
 
 Room::Room(ROOM_TYPE _type, unsigned short _capacity)
 	:	m_type(_type),
