@@ -43,6 +43,14 @@ public:
 
 	Lesson(const std::string&, const Teacher&, const Room&, std::initializer_list<Class>);
 
+	Lesson(const Lesson&) = default;
+
+	Lesson& operator =(const Lesson&) = default;
+
+	Lesson(Lesson&&) = default;
+
+	Lesson& operator =(Lesson&&) = default;
+
 public:
 
 	const std::string m_UEname;

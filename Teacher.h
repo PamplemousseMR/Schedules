@@ -75,6 +75,14 @@ public:
 
 	void display() const;
 
+	Teacher(const Teacher&) = default;
+
+	Teacher& operator =(const Teacher&) = default;
+
+	Teacher(Teacher&&) = default;
+
+	Teacher& operator =(Teacher&&) = default;
+
 private:
 
 	template <typename... Args>

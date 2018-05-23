@@ -31,6 +31,10 @@ typedef struct Tuple_t
 	Lesson::LESSON_SLOT m_slot;
 } Tuple;
 
+static std::vector<Subject> s_sub_shuffle;
+static std::vector<Tuple> s_tup_shuffle_first;
+static std::vector<Tuple> s_tup_shuffle_second;
+
 \end
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -110,25 +114,68 @@ std::vector<T> shuffleVector(const std::vector<T>& _vec)
 
 \Before everything else function:
 	std::cout << "Teacher list =>" << std::endl;
-	for(Teacher _t : Teacher::s_teachers)
+	for(const Teacher& _t : Teacher::s_teachers)
 	{
 		_t.display();
 	}
 	std::cout << "Room list =>" << std::endl;
-	for(Room _r : Room::s_rooms)
+	for(const Room& _r : Room::s_rooms)
 	{
 		_r.display();
 	}
 	std::cout << "Class list =>" << std::endl;
-	for(Class _c : Class::s_class)
+	for(const Class& _c : Class::s_class)
 	{
 		_c.display();
 	}
 	std::cout << "Subject list =>" << std::endl;
-	for(Subject _s : Subject::s_subjects)
+	for(const Subject& _s : Subject::s_subjects)
 	{
 		_s.display();
 	}
+
+	#pragma omp parallel
+	{
+		#pragma omp single
+		{
+			#pragma omp task
+			{
+				for(unsigned i = 0; i < Subject::s_subjects.size(); ++i)
+				{
+					const Subject& subject = Subject::s_subjects.at(i);
+					float number = subject.m_modality.at(Subject::CM)/Lesson::SLOT_INTERVAL; 
+					for(float j = 0.; j < number; j++)
+					{
+						s_sub_shuffle.push_back(subject);
+					}
+				}
+			}
+
+		  	#pragma omp task
+			{
+			  	for(unsigned i = Room::s_amphiOffset; i < Room::s_amphiCount; ++i)
+			  	{
+			  		for(unsigned short _week = 0; _week < WEEK_BY_SEMESTER; ++_week)
+					{
+						for(unsigned short _day = 0; _day < Lesson::DAY_SIZE; ++_day)
+						{
+							for(unsigned short _slot = 0; _slot < Lesson::SLOT_SIZE; ++_slot)
+							{
+								{
+									Tuple tuple {_week, Room::s_rooms[i], static_cast<Lesson::LESSON_DAY>(_day), static_cast<Lesson::LESSON_SLOT>(_slot)};
+									s_tup_shuffle_first.push_back(tuple);
+								}
+								{
+									Tuple tuple {_week+WEEK_BY_SEMESTER, Room::s_rooms[i], static_cast<Lesson::LESSON_DAY>(_day), static_cast<Lesson::LESSON_SLOT>(_slot)};
+									s_tup_shuffle_second.push_back(tuple);
+								}
+							}
+						}
+					}
+			  	} 
+			}
+		}
+  	}
 \end
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -178,43 +225,27 @@ std::vector<T> shuffleVector(const std::vector<T>& _vec)
 	Schedules* schedules = new Schedules();
 
 	std::vector<Subject> sub_shuffle;
-	for(unsigned i = 0; i < Subject::s_subjects.size(); ++i)
+	std::vector<Tuple> tup_shuffle_first;
+	std::vector<Tuple> tup_shuffle_second;
+
+	#pragma omp parallel
 	{
-		const Subject& subject = Subject::s_subjects.at(i);
-		float number = subject.m_modality.at(Subject::CM)/Lesson::SLOT_INTERVAL; 
-		for(float j = 0.; j < number; j++)
+		#pragma omp single
 		{
-			sub_shuffle.push_back(subject);
-		}
-	}
-
-  	sub_shuffle = shuffleVector(sub_shuffle);
-
-  	std::vector<Tuple> tup_shuffle_first;
-  	std::vector<Tuple> tup_shuffle_second;
-  	for(unsigned i = Room::s_amphiOffset; i < Room::s_amphiCount; ++i)
-  	{
-  		for(unsigned short _week = 0; _week < WEEK_BY_SEMESTER; ++_week)
-		{
-			for(unsigned short _day = 0; _day < Lesson::DAY_SIZE; ++_day)
+			#pragma omp task
 			{
-				for(unsigned short _slot = 0; _slot < Lesson::SLOT_SIZE; ++_slot)
-				{
-					{
-						Tuple tuple {_week, Room::s_rooms[i], static_cast<Lesson::LESSON_DAY>(_day), static_cast<Lesson::LESSON_SLOT>(_slot)};
-						tup_shuffle_first.push_back(tuple);
-					}
-					{
-						Tuple tuple {_week+WEEK_BY_SEMESTER, Room::s_rooms[i], static_cast<Lesson::LESSON_DAY>(_day), static_cast<Lesson::LESSON_SLOT>(_slot)};
-						tup_shuffle_second.push_back(tuple);
-					}
-				}
+				sub_shuffle = shuffleVector(s_sub_shuffle);
+			}
+			#pragma omp task
+			{
+			  	tup_shuffle_first = shuffleVector(s_tup_shuffle_first);
+			}
+			#pragma omp task
+			{
+			  	tup_shuffle_second = shuffleVector(s_tup_shuffle_second);
 			}
 		}
-  	} 
-
-  	tup_shuffle_first = shuffleVector(tup_shuffle_first);
-  	tup_shuffle_second = shuffleVector(tup_shuffle_second);
+	}
 
   	//TODO
   	const Teacher& t = Teacher::s_teachers[0];
@@ -293,7 +324,7 @@ std::vector<T> shuffleVector(const std::vector<T>& _vec)
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
 \User Makefile options:
-	CPPFLAGS += -std=c++11
+	CPPFLAGS += -std=c++11 -o3
 \end
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -42,6 +42,14 @@ public:
 
 	void display() const;
 
+	Room(const Room&) = default;
+
+	Room& operator =(const Room&) = default;
+
+	Room(Room&&) = default;
+
+	Room& operator =(Room&&) = default;
+
 private:
 
 	Room(ROOM_TYPE, unsigned short);

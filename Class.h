@@ -53,6 +53,14 @@ public:
 
 	void display() const;
 
+	Class(const Class&) = default;
+
+	Class& operator =(const Class&) = default;
+
+	Class(Class&&) = default;
+
+	Class& operator =(Class&&) = default;
+
 private:
 
 	Class(CLASS_YEAR, CLASS_SPE, CLASS_GROUP, short);
