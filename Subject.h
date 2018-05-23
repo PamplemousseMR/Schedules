@@ -159,8 +159,6 @@ const std::vector<Subject> Subject::s_subjects
 	Subject("UE411", S4, OILNGAS, PHYSICS, 15, 0, 6, 9)
 };
 
-const unsigned short Subject::SUBJECT_MODALITY_SIZE = 4;
-
 unsigned short Subject::s_s1Count = 7;
 
 unsigned short Subject::s_s1Offset = 0;
@@ -176,6 +174,8 @@ unsigned short Subject::s_s3Offset = s_s2Offset+s_s2Count;
 unsigned short Subject::s_s4Count = 14;
 
 unsigned short Subject::s_s4Offset = s_s3Offset+s_s3Count;
+
+const unsigned short Subject::SUBJECT_MODALITY_SIZE = 4;
 
 Subject::Subject(const std::string& _name, SUBJECT_SEMESTER _semester, SUBJECT_SPECIALITY _speciality, SUBJECT_TYPE _type, 
 		unsigned short _cm, unsigned short _ci, unsigned short _td, unsigned short _tp)

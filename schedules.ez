@@ -9,6 +9,7 @@
 #include "Room.h"
 #include "Subject.h"
 #include "Class.h"
+#include "Lesson.h"
 
 /* ---------------------------------------------------------------------------------
 										Schedules
@@ -18,80 +19,18 @@ static const unsigned short WEEK_BY_SEMESTER = 14;
 static const unsigned short MAX_HOUR_PER_WEEK = 30;
 static const unsigned short MAX_HOUR_PER_DAY = 6; 
 
-/* ---------------------------
-		Day
---------------------------- */
-
-static const unsigned short DAY_SIZE = 5;
-
-enum DAY
-{
-	MONDAY,
-	TUESDAY,
-	WEDNESDAY,
-	THURSDAY,
-	FRIDAY
-};
-
-/* ---------------------------
-		Time slots
---------------------------- */
-
-static const float SLOT_INTERVAL = 1.5;
-
-static const unsigned short SLOT_SIZE = 4;
-
-enum SLOT
-{
-	SLOT_0,
-	SLOT_1,
-	SLOT_2,
-	SLOT_3
-};
-
-/* ---------------------------
-		Lesson
---------------------------- */
-
-class Lesson
-{
-
-public:
-
-	Lesson(const std::string& _ueName, const Teacher& _teacher, const Room& _room,
-									std::initializer_list<Class> _classList)
-		: 	m_UEname(_ueName),
-			m_teacher(_teacher),
-			m_room(_room),
-			m_class(_classList.begin(), _classList.end())
-	{
-	}
-
-public:
-
-	const std::string m_UEname;
-
-	const Teacher& m_teacher;
-
-	const Room& m_room;
-	
-	const std::vector<Class> m_class;
-
-};
-
-/* ---------------------------
-		Schedules
---------------------------- */
-
-typedef std::map<SLOT, std::vector<Lesson>> Day;
-typedef std::map<DAY, Day> Week;
+typedef std::map<Lesson::LESSON_SLOT, std::vector<Lesson>> Day;
+typedef std::map<Lesson::LESSON_DAY, Day> Week;
 typedef std::map<int, Week> Schedules; 
 
 \end
 
+/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
+
 \User functions:
 
-bool TeacherBusy(const Day& _day, const SLOT _slot, const Teacher& _teacher)
+bool TeacherBusy(const Day& _day, const Lesson::LESSON_SLOT _slot, const Teacher& _teacher)
 {
 	for(const Lesson& lesson : _day.at(_slot))
 	{
@@ -103,7 +42,7 @@ bool TeacherBusy(const Day& _day, const SLOT _slot, const Teacher& _teacher)
 	return false;
 }
 
-bool RoomBusy(const Day& _day, const SLOT _slot, const Room& _room)
+bool RoomBusy(const Day& _day, const Lesson::LESSON_SLOT _slot, const Room& _room)
 {
 	for(const Lesson& lesson : _day.at(_slot))
 	{
@@ -115,7 +54,7 @@ bool RoomBusy(const Day& _day, const SLOT _slot, const Room& _room)
 	return false;
 }
 
-bool ClassBusy(const Day& _day, const SLOT _slot, const Class& _class)
+bool ClassBusy(const Day& _day, const Lesson::LESSON_SLOT _slot, const Class& _class)
 {
 	for(const Lesson& lesson : _day.at(_slot))
 	{
@@ -192,8 +131,14 @@ Subject::SUBJECT_MODALITY getSubjectFreeType(int _subjectIndex, float (*_totalCo
 
 \end
 
+/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
+
 \User CUDA:
 \end
+
+/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
 \Before everything else function:
 	std::cout << "Teacher list =>" << std::endl;
@@ -218,17 +163,32 @@ Subject::SUBJECT_MODALITY getSubjectFreeType(int _subjectIndex, float (*_totalCo
 	}
 \end
 
+/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
+
 \After everything else function:
 \end
+
+/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
 \At the beginning of each generation function:
 \end
 
+/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
+
 \At the end of each generation function:
 \end
 
+/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
+
 \At each generation before reduce function:
 \end
+
+/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
 \User classes :
 	GenomeClass { 
@@ -236,8 +196,14 @@ Subject::SUBJECT_MODALITY getSubjectFreeType(int _subjectIndex, float (*_totalCo
 	}
 \end
 
+/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
+
 \GenomeClass::display:
 \end
+
+/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
 \GenomeClass::initialiser:
 	/*
@@ -245,13 +211,13 @@ Subject::SUBJECT_MODALITY getSubjectFreeType(int _subjectIndex, float (*_totalCo
 	typedef std::map<DAY, Day> Week;
 	typedef std::map<int, Week> Schedules;
 	*/
-	float totalHour[Subject::s_subjects.size()][4];
-    #pragma omp parallel for shared(totalHour)
+	float totalSubjectHour[Subject::s_subjects.size()][4];
+    #pragma omp parallel for shared(totalSubjectHour)
 	for(unsigned int i=0 ; i<Subject::s_subjects.size(); ++i)
 	{
 		for(unsigned int j=0 ; j<4 ; ++j)
 		{
-			totalHour[i][j] = 0.f;
+			totalSubjectHour[i][j] = 0.f;
 		}
 	}
 
@@ -261,16 +227,16 @@ Subject::SUBJECT_MODALITY getSubjectFreeType(int _subjectIndex, float (*_totalCo
 	for(unsigned short _week = 0; _week < WEEK_BY_SEMESTER; ++_week)
 	{
 		Week week;
-		for(unsigned short _day = 0; _day < DAY_SIZE; ++_day)
+		for(unsigned short _day = 0; _day < Lesson::DAY_SIZE; ++_day)
 		{
 			Day day;
-			for(unsigned short _slot = 0; _slot < SLOT_SIZE; ++_slot)
+			for(unsigned short _slot = 0; _slot < Lesson::SLOT_SIZE; ++_slot)
 			{
-				int subjectIndex = getRandomSubject(Subject::S1, totalHour);
+				int subjectIndex = getRandomSubject(Subject::S1, totalSubjectHour);
 				if(subjectIndex != -1)
 				{
-					Subject::SUBJECT_MODALITY modality = getSubjectFreeType(subjectIndex, totalHour);
-					totalHour[subjectIndex][modality] += SLOT_INTERVAL;
+					Subject::SUBJECT_MODALITY modality = getSubjectFreeType(subjectIndex, totalSubjectHour);
+					totalSubjectHour[subjectIndex][modality] += Lesson::SLOT_INTERVAL;
 
 					//TODO
 					std::cout << "{" << _week << " " << _day << " " << _slot << "} "<< subjectIndex << " " << modality << std::endl;
@@ -280,28 +246,49 @@ Subject::SUBJECT_MODALITY getSubjectFreeType(int _subjectIndex, float (*_totalCo
 
 				}
 			}
-			week[static_cast<DAY>(_day)] = day;
+			week[static_cast<Lesson::LESSON_DAY>(_day)] = day;
 		}
 		(*schedules)[_week] = week;
 	}
 
+	for(int i=0 ; i<Subject::s_subjects.size() ; ++i)
+	{
+		std::cout << totalSubjectHour[i][0] << " " << totalSubjectHour[i][1] << " " << totalSubjectHour[i][2] << " " << totalSubjectHour[i][3] << std::endl; 
+	}
+
+	exit(0);
 	Genome.m_schedules = (void*)schedules;
 \end
 
+/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
+
 \GenomeClass::crossover:
 \end
+
+/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
 \GenomeClass::mutator:
   	return 1;
 \end
 
+/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
+
 \GenomeClass::evaluator:
 	return 1;
 \end
 
+/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
+
 \User Makefile options:
 	CPPFLAGS += -std=c++11
 \end
+
+/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
 \Default run parameters :         // Please let the parameters appear in this order
 Number of generations : 300       // NB_GEN
