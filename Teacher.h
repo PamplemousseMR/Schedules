@@ -73,8 +73,6 @@ public:
 
 public:
 
-	void display() const;
-
 	Teacher(const Teacher&) = default;
 
 	Teacher& operator =(const Teacher&) = default;
@@ -82,6 +80,22 @@ public:
 	Teacher(Teacher&&) = default;
 
 	Teacher& operator =(Teacher&&) = default;
+
+	friend std::ostream& operator <<(std::ostream& _o, const Teacher& _t)
+	{
+		std::string type; 
+		switch(_t.m_type) 
+		{ 
+			case MATHS: type = "MATHS"; break; 
+			case PHYSICS: type = "PHYSICS"; break; 
+			case COMPUTER: type = "COMPUTER"; break; 
+			case CHEMISTRY: type = "CHEMISTRY"; break; 
+			case ENGLISH: type = "ENGLISH"; break; 
+			case FRENCH: type = "FRENCH"; break; 
+		} 
+		_o << "[" << type << "_" << _t.m_name << "]";
+		return _o;
+	}
 
 private:
 
@@ -152,54 +166,3 @@ Teacher::Teacher(TEACHERS_TYPE _type, TEACHERS_TIME _time, const std::string& _n
 	}
 	variadic_map_emplace(m_availability, std::forward<Args>(_notAvailable)...);
 }
-
-void Teacher::display() const
-{
-	std::string type;
-	switch(m_type)
-	{
-		case MATHS: type = "MATHS"; break;
-		case PHYSICS: type = "PHYSICS"; break;
-		case COMPUTER: type = "COMPUTER"; break;
-		case CHEMISTRY: type = "CHEMISTRY"; break;
-		case ENGLISH: type = "ENGLISH"; break;
-		case FRENCH: type = "FRENCH"; break;
-	}
-	std::string time;
-	switch(m_time)
-	{
-		case FULL: time = "FULL"; break;
-		case HALF: time = "HALF"; break;
-		case HOUR: time = "HOUR"; break;
-	}
-	std::cout << "Teacher {" << type << "} : " << m_name << " " << time << " => \n";
-	for(int i=0 ; i<5 ; ++i)
-	{
-		std::string day;
-		switch((TEACHERS_DAY)i)
-		{
-			case MONDAY: day = "MONDAY"; break;
-			case TUESDAY: day = "TUESDAY"; break;
-			case WEDNESDAY: day = "WEDNESDAY"; break;
-			case THURSDAY: day = "THURSDAY"; break;
-			case FRIDAY: day = "FRIDAY"; break;
-		}
-		std::cout << "\t" << day << " :";
-		for(int j=0 ; j<4 ; ++j)
-		{
-			std::string slot;
-			switch((TEACHERS_SLOT)j)
-			{
-				case SLOT_0: slot = "8h30-10h00"; break;
-				case SLOT_1: slot = "10h15-11h45"; break;
-				case SLOT_2: slot = "12h45-14h15"; break;
-				case SLOT_3: slot = "14h30-16h00"; break;
-			}
-			if(!m_availability.at((TEACHERS_DAY)i).at((TEACHERS_SLOT)j))
-			{
-				std::cout << " " << slot << "(false),";
-			}
-		}
-		std::cout << std::endl;;
-	}
-} 

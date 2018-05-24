@@ -22,11 +22,11 @@ public:
 	
 	enum SUBJECT_SPECIALITY
 	{
-		COMMUN,
 		CHEMICAL,
 		COMPUTER,
 		GEOPHYSICAL,
-		OILNGAS
+		OILNGAS ,
+		COMMUN
 	};
 
 	enum SUBJECT_SEMESTER
@@ -53,7 +53,8 @@ public:
 		CM,
 		CI,
 		TD,
-		TP
+		TP,
+		MODALITY_SIZE
 	};
 
 public:
@@ -70,7 +71,13 @@ public:
 
 public:
 
-	void display() const;
+	Subject(const Subject&) = default;
+
+	Subject& operator =(const Subject&) = default;
+
+	Subject(Subject&&) = default;
+
+	Subject& operator =(Subject&&) = default;
 
 private:
 
@@ -115,10 +122,10 @@ const std::vector<Subject> Subject::s_subjects
 	Subject("UE307", S3, COMPUTER, COMPUTER_SCIENCE, 21, 0, 21, 12),
 	Subject("UE308", S3, COMPUTER, COMPUTER_SCIENCE, 15, 0, 0, 21),
 
-	Subject("UE305b", S3, GEOPHYSICAL, PHYSICS, 30, 0, 21, 21),
+	Subject("UE305b", S3, GEOPHYSICAL, CHEMISTRY, 30, 0, 21, 21),
 	Subject("UE309", S3, GEOPHYSICAL, PHYSICS, 0, 30, 0, 0),
 
-	Subject("UE305c", S3, OILNGAS, PHYSICS, 30, 0, 21, 21),
+	Subject("UE305c", S3, OILNGAS, CHEMISTRY, 30, 0, 21, 21),
 	Subject("UE310", S3, OILNGAS, PHYSICS, 15, 0, 9, 6),
 
 	Subject("UE401", S4, COMMUN, MATHS, 30, 0, 42, 0),
@@ -134,10 +141,10 @@ const std::vector<Subject> Subject::s_subjects
 	Subject("UE408", S4, COMPUTER, COMPUTER_SCIENCE, 21, 0, 21, 12),
 	Subject("UE409", S4, COMPUTER, COMPUTER_SCIENCE, 18, 0, 18, 12),
 
-	Subject("UE4062", S4, GEOPHYSICAL, PHYSICS, 30, 0, 30, 21),
+	Subject("UE4062", S4, GEOPHYSICAL, CHEMISTRY, 30, 0, 30, 21),
 	Subject("UE410", S4, GEOPHYSICAL, PHYSICS, 0, 30, 0, 0),
 
-	Subject("UE406c", S4, OILNGAS, PHYSICS, 30, 0, 30, 21),
+	Subject("UE406c", S4, OILNGAS, CHEMISTRY, 30, 0, 30, 21),
 	Subject("UE411", S4, OILNGAS, PHYSICS, 15, 0, 6, 9)
 };
 
@@ -153,31 +160,3 @@ Subject::Subject(const std::string& _name, SUBJECT_SEMESTER _semester, SUBJECT_S
 	m_modality[TD] = _td;
 	m_modality[TP] = _tp;
 }
- 
-void Subject::display() const
-{
-	std::string semester;
-	switch(m_semester)
-	{
-		case S1: semester = "S1"; break;
-		case S2: semester = "S2"; break;
-		case S3: semester = "S3"; break;
-		case S4: semester = "S4"; break;
-	}
-	
-	std::string speciality;
-	switch(m_speciality)
-	{
-		case COMMUN: speciality = "COMMUN"; break;
-		case CHEMICAL: speciality = "CHEMICAL"; break;
-		case COMPUTER: speciality = "COMPUTER"; break;
-		case GEOPHYSICAL: speciality = "GEOPHYSICAL"; break;
-		case OILNGAS: speciality = "OILNGAS"; break;
-	}
-	
-	std::cout << "Subject {" << m_name << "  " << semester << " " << speciality << "} =>" ;
-	std::cout << "\n\tCM : " << m_modality.at(CM) << "H";
-	std::cout << "\n\tCI : " << m_modality.at(CI) << "H";
-	std::cout << "\n\tTD : " << m_modality.at(TD) << "H";
-	std::cout << "\n\tTP : " << m_modality.at(TP) << "H" << std::endl;
-} 

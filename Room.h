@@ -17,10 +17,6 @@ public:
 
 	static const std::vector<Room> s_rooms;
 
-	static unsigned short s_amphiCount;
-
-	static unsigned short s_amphiOffset;
-
 public:
 
 	enum ROOM_TYPE
@@ -39,8 +35,6 @@ public:
 	const unsigned short m_capacity;
 
 public:
-
-	void display() const;
 
 	Room(const Room&) = default;
 
@@ -86,26 +80,8 @@ const std::vector<Room> Room::s_rooms
 	Room(LABORATORY, 20)
 };
 
-unsigned short Room::s_amphiCount = 2;
-
-unsigned short Room::s_amphiOffset = 0;
-
 Room::Room(ROOM_TYPE _type, unsigned short _capacity)
 	:	m_type(_type),
 		m_capacity(_capacity)
 {
-}
-
-void Room::display() const
-{
-	std::string type;
-	switch(m_type)
-	{
-		case ROOM: type = "ROOM"; break;
-		case AMPHI: type = "AMPHI"; break;
-		case LANGUAGE: type = "LANGUAGE"; break;
-		case COMPUTER: type = "COMPUTER"; break;
-		case LABORATORY: type = "LABORATORY"; break;
-	}
-	std::cout << "Room {" << type << "} : " << m_capacity << std::endl;
 }

@@ -17,6 +17,16 @@ public:
 
 	static const std::vector<Class> s_class;
 
+	static const unsigned short s_L0Count;
+
+	static const unsigned short s_L0Offset;
+
+	static const unsigned short s_L1Count;
+
+	static const unsigned short s_L1Offset;
+						
+	static const unsigned short s_specialityPerYeer;
+
 public:
 
 	enum CLASS_YEAR
@@ -51,8 +61,6 @@ public:
 
 public:
 
-	void display() const;
-
 	Class(const Class&) = default;
 
 	Class& operator =(const Class&) = default;
@@ -70,6 +78,16 @@ private:
 /* ---------------------------------------------------------------------------------
 										Definition
 --------------------------------------------------------------------------------- */
+
+const unsigned short Class::s_L0Count = 8;
+
+const unsigned short Class::s_L0Offset = 0;
+
+const unsigned short Class::s_L1Count = 8;
+
+const unsigned short Class::s_L1Offset = Class::s_L0Count + Class::s_L0Offset;
+		
+const unsigned short Class::s_specialityPerYeer = 4;
 
 const std::vector<Class> Class::s_class
 {
@@ -98,36 +116,3 @@ Class::Class(CLASS_YEAR _year, CLASS_SPE _spe, CLASS_GROUP _group, short _studen
 		m_students(_students)
 {
 }
-
-void Class::display() const
-{
-	std::string year;
-	switch(m_year)
-	{
-		case L0: year = "L0"; break;
-		case L1: year = "L1"; break;
-	}
-	
-	std::string spe;
-	switch(m_spe)
-	{
-		case SPE_A: spe = "SPE_A"; break;
-		case SPE_B: spe = "SPE_B"; break;
-		case SPE_C: spe = "SPE_C"; break;
-		case SPE_D: spe = "SPE_D"; break;
-	}
-	
-	std::string group;
-	switch(m_group)
-	{
-		case A: group = "A"; break;
-		case B: group = "B"; break;
-	}
-
-	std::cout << "Class {";
-	std::cout << "\n\tYear : " << year;
-	std::cout << "\n\tSpe : " << spe;
-	std::cout << "\n\tGroup : " << group;
-	std::cout << "\n\tStudents : " << m_students;
-	std::cout << "}" << std::endl;
-} 

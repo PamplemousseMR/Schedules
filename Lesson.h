@@ -14,11 +14,7 @@ class Lesson
 
 public:
 
-	static const unsigned short DAY_SIZE;
-
 	static const float SLOT_INTERVAL;
-
-	static const unsigned short SLOT_SIZE;
 
 public:
 
@@ -28,7 +24,8 @@ public:
 		TUESDAY,
 		WEDNESDAY,
 		THURSDAY,
-		FRIDAY
+		FRIDAY,
+		DAY_SIZE
 	};
 
 	enum LESSON_SLOT
@@ -36,12 +33,13 @@ public:
 		SLOT_0,
 		SLOT_1,
 		SLOT_2,
-		SLOT_3
+		SLOT_3,
+		SLOT_SIZE
 	};
 
 public:
 
-	Lesson(const std::string&, const Teacher&, const Room&, std::initializer_list<Class>);
+	Lesson(const Subject&, const Teacher&, const Room&, std::initializer_list<Class>);
 
 	Lesson(const Lesson&) = default;
 
@@ -53,7 +51,7 @@ public:
 
 public:
 
-	const std::string m_UEname;
+	const Subject& m_subject;
 
 	const Teacher& m_teacher;
 
@@ -67,15 +65,11 @@ public:
 										Definition
 --------------------------------------------------------------------------------- */
 
-const unsigned short Lesson::DAY_SIZE = 5;
-
 const float Lesson::SLOT_INTERVAL = 1.5f;
 
-const unsigned short Lesson::SLOT_SIZE = 4;
-
-Lesson::Lesson(const std::string& _ueName, const Teacher& _teacher, const Room& _room,
+Lesson::Lesson(const Subject& _subject, const Teacher& _teacher, const Room& _room,
 								std::initializer_list<Class> _classList)
-	: 	m_UEname(_ueName),
+	: 	m_subject(_subject),
 		m_teacher(_teacher),
 		m_room(_room),
 		m_class(_classList.begin(), _classList.end())
