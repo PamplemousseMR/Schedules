@@ -3,11 +3,11 @@
 #include <utility>
 #include <functional>
 
-#include "Teacher.h"
-#include "Room.h"
-#include "Subject.h"
-#include "Class.h"
-#include "Lesson.h"
+#include "Teacher.hpp"
+#include "Room.hpp"
+#include "Subject.hpp"
+#include "Class.hpp"
+#include "Lesson.hpp"
 
 /* ---------------------------------------------------------------------------------
 										Schedules
@@ -21,7 +21,7 @@ typedef std::map<Lesson::LESSON_SLOT, std::vector<Lesson>> Day;
 typedef std::map<Lesson::LESSON_DAY, Day> Week;
 typedef std::map<int, Week> Schedules; 
 
-static const std::vector< std::tuple< Subject::SUBJECT_MODALITY, const Subject&, std::initializer_list<Class> > > s_MAP;
+static const std::vector< std::tuple< Subject::SUBJECT_MODALITY, const Subject&, const Class& > > s_MAP;
 
 \end
 
@@ -142,17 +142,15 @@ const Room& randRoom(const Subject& _subject, Subject::SUBJECT_MODALITY _subMod)
 
 \Before everything else function:
 
-	auto& list = const_cast< std::vector< std::tuple< Subject::SUBJECT_MODALITY, const Subject&, std::initializer_list<Class> > >& >(s_MAP);
+	auto& list = const_cast< std::vector< std::tuple< Subject::SUBJECT_MODALITY, const Subject&, const Class& > >& >(s_MAP);
 
 	for(unsigned i = 0; i < Subject::s_subjects.size(); ++i) 
 	{ 
-		const Subject& subject = Subject::s_subjects.at(i); 
-		//std::cout << "init ---------------------- : " << &subject << std::endl;
+		const Subject& subject = Subject::s_subjects[i]; 
 		for(int modality = 0 ; modality < Subject::MODALITY_SIZE ; ++modality)
 		{
 			Subject::SUBJECT_MODALITY mod = static_cast<Subject::SUBJECT_MODALITY>(modality);
-			float number = subject.m_modality.at(mod)/Lesson::SLOT_INTERVAL; 
-			std::initializer_list<Class> classes; 
+			float number = subject.m_modality.at(mod)/Lesson::SLOT_INTERVAL;
 			switch(subject.m_semester)
 			{
 				case Subject::S1 :
@@ -161,35 +159,26 @@ const Room& randRoom(const Subject& _subject, Subject::SUBJECT_MODALITY _subMod)
 					{
 						case Subject::CM : 
 						case Subject::CI : 
-          					classes = {Class::s_class[0], Class::s_class[1], Class::s_class[2], Class::s_class[3], Class::s_class[4], Class::s_class[5], Class::s_class[6], Class::s_class[7]};
-	        				for(float j = 0.f; j < number; j++) 
+          					for(float j = 0.f; j < number; j++) 
 	        				{ 
-	        					//std::cout << "init 2 : " << &subject << std::endl;
-	            				list.emplace_back(std::make_tuple(mod, std::ref(subject), classes)); 
-	            				//std::cout << "init 3 : " << &list[list.size()-1] << std::endl;
+	            				list.emplace_back(mod, subject, Class::s_classes[0]);
 	        				}  
 						break;
 						case Subject::TD : 
 							for(int spe = 0; spe < Class::s_specialityPerYeer; ++spe)
 							{
-								classes = {Class::s_class[Class::s_L0Offset+spe*2], Class::s_class[Class::s_L0Offset+spe*2+1]};
 								for(float j = 0.f; j < number; j++) 
 		        				{ 
-		        					//std::cout << "init 2 : " << &subject << std::endl;
-		            				list.emplace_back(std::make_tuple(mod, std::ref(subject), classes)); 
-		            				//std::cout << "init 3 : " << &list[list.size()-1] << std::endl;
+		            				list.emplace_back(mod, subject, Class::s_classes[2+spe]); 
 		        				}  
 		        			}
 						break;
 						case Subject::TP : 
 							for(int tp = 0; tp < Class::s_L0Count; ++tp)
 							{
-								classes = {Class::s_class[Class::s_L0Offset+tp]};
 								for(float j = 0.f; j < number; j++) 
 			        			{ 
-			        				//std::cout << "init 2 : " << &subject << std::endl;
-			            			list.emplace_back(std::make_tuple(mod, std::ref(subject), classes));
-									//std::cout << "init 3 : " << &list[list.size()-1] << std::endl;
+			            			list.emplace_back(mod, subject, Class::s_classes[10+tp]);
 			        			}  
 		        			}
 						break;
@@ -205,42 +194,36 @@ const Room& randRoom(const Subject& _subject, Subject::SUBJECT_MODALITY _subMod)
 						case Subject::CI :
 							if(subject.m_speciality == Subject::COMMUN) 
 							{
-								classes = {Class::s_class[8], Class::s_class[9], Class::s_class[10], Class::s_class[11], Class::s_class[12], Class::s_class[13], Class::s_class[14], Class::s_class[15]};
-	        				}
+								for(float j = 0.f; j < number; j++) 
+			        			{ 
+			            			list.emplace_back(mod, subject, Class::s_classes[1]);
+			        			}  
+							}
 	        				else
 	        				{
-	        					classes = {Class::s_class[Class::s_L1Offset+subject.m_speciality*2], Class::s_class[Class::s_L1Offset+subject.m_speciality*2+1]};
-	        				}
-	        				for(float j = 0.f; j < number; j++) 
-	        				{	 
-	        					//std::cout << "init 2 : " << &subject << std::endl;
-	            				list.emplace_back(std::make_tuple(mod, std::ref(subject), classes)); 
-	            				//std::cout << "init 3 : " << &list[list.size()-1] << std::endl;
-	        				}
+								for(float j = 0.f; j < number; j++) 
+			        			{ 
+			            			list.emplace_back(mod, subject, Class::s_classes[6+subject.m_speciality]);
+			        			}  
+							}
 						break;
 						case Subject::TD : 
 							if(subject.m_speciality == Subject::COMMUN) 
 							{
 								for(int spe = 0; spe < Class::s_specialityPerYeer; ++spe)
 								{
-									classes = {Class::s_class[Class::s_L1Offset+spe*2], Class::s_class[Class::s_L1Offset+spe*2+1]};
 									for(float j = 0.f; j < number; j++) 
 		        					{ 
-		        						//std::cout << "init 2 : " << &subject << std::endl;
-		            					list.emplace_back(std::make_tuple(mod, std::ref(subject), classes)); 
-		            					//std::cout << "init 3 : " << &list[list.size()-1] << std::endl;
+		            					list.emplace_back(mod, subject, Class::s_classes[6+spe]); 
 		        					}  
 		        				}
 		        			}
 		        			else
 		        			{
-	        					classes = {Class::s_class[Class::s_L1Offset+subject.m_speciality*2], Class::s_class[Class::s_L1Offset+subject.m_speciality*2+1]};
 								for(float j = 0.f; j < number; j++) 
-		        				{ 
-		        					//std::cout << "init 2 : " << &subject << std::endl;
-		            				list.emplace_back(std::make_tuple(mod, std::ref(subject), classes)); 
-		            				//std::cout << "init 3 : " << &list[list.size()-1] << std::endl;
-		        				}  
+			        			{ 
+			            			list.emplace_back(mod, subject, Class::s_classes[6+subject.m_speciality]);
+			        			}  
 	        				}
 						break;
 						case Subject::TP : 
@@ -248,30 +231,21 @@ const Room& randRoom(const Subject& _subject, Subject::SUBJECT_MODALITY _subMod)
 							{
 								for(int tp = 0; tp < Class::s_L1Count; ++tp)
 								{
-									classes = {Class::s_class[Class::s_L1Offset+tp]};
 									for(float j = 0.f; j < number; j++) 
-				        			{ 
-				        				//std::cout << "init 2 : " << &subject << std::endl;
-				            			list.emplace_back(std::make_tuple(mod, std::ref(subject), classes)); 
-				            			//std::cout << "init 3 : " << &list[list.size()-1] << std::endl;
-				        			}  
+									{ 
+										list.emplace_back(mod, subject, Class::s_classes[18+tp]);
+									}  
 			        			}
 		        			}
 		        			else
 		        			{
-		        				classes = {Class::s_class[Class::s_L1Offset+subject.m_speciality*2]};
 								for(float j = 0.f; j < number; j++) 
 			        			{ 
-			        				//std::cout << "init 2 : " << &subject << std::endl;
-			            			list.emplace_back(std::make_tuple(mod, std::ref(subject), classes)); 
-			            			//std::cout << "init 3 : " << &list[list.size()-1] << std::endl;
+			            			list.emplace_back(mod, subject, Class::s_classes[18+subject.m_speciality*2]);
 			        			}  
-			        			classes = {Class::s_class[Class::s_L1Offset+subject.m_speciality*2+1]};
 								for(float j = 0.f; j < number; j++) 
 			        			{ 
-			        				//std::cout << "init 2 : " << &subject << std::endl;
-			            			list.emplace_back(std::make_tuple(mod, std::ref(subject), classes)); 
-			            			//std::cout << "init 3 : " << &list[list.size()-1] << std::endl;
+			            			list.emplace_back(mod, subject, Class::s_classes[18+subject.m_speciality*2+1]);
 			        			}  
 		        			}	
 						break;
@@ -282,7 +256,6 @@ const Room& randRoom(const Subject& _subject, Subject::SUBJECT_MODALITY _subMod)
 			} 
 		}
 	} 
-
 	list = shuffleVector(list);
 
 \end
@@ -337,7 +310,7 @@ const Room& randRoom(const Subject& _subject, Subject::SUBJECT_MODALITY _subMod)
 	{
 		Subject::SUBJECT_MODALITY mod = std::get<0>(tuple);
 		const Subject& sub = std::get<1>(tuple);
-		const std::initializer_list<Class>& classes = std::get<2>(tuple);
+		const Class& classes = std::get<2>(tuple);
 		int randWeek = random(0, WEEK_BY_SEMESTER);
 		if(sub.m_semester == Subject::S2 || sub.m_semester == Subject::S4)
 		{
@@ -346,11 +319,11 @@ const Room& randRoom(const Subject& _subject, Subject::SUBJECT_MODALITY _subMod)
 		int randDay = random(0, Lesson::DAY_SIZE);
 		int randSlot = random(0, Lesson::SLOT_SIZE);
 
-		(*schedules)[randWeek][static_cast<Lesson::LESSON_DAY>(randDay)][static_cast<Lesson::LESSON_SLOT>(randSlot)].emplace_back(Lesson(sub, randTeacher(sub), randRoom(sub, mod), classes));
+		(*schedules)[randWeek][static_cast<Lesson::LESSON_DAY>(randDay)][static_cast<Lesson::LESSON_SLOT>(randSlot)].emplace_back(sub, randTeacher(sub), randRoom(sub, mod), classes, mod);
 	}
 
 	//static const std::vector< std::tuple< Subject::SUBJECT_MODALITY, Subject, std::initializer_list<Class> > > s_MAP;
-	for(unsigned short _week = 0; _week < WEEK_BY_SEMESTER*2; ++_week)
+	/*for(unsigned short _week = 0; _week < WEEK_BY_SEMESTER*2; ++_week)
 	{
 		for(unsigned short _day = 0; _day < Lesson::DAY_SIZE; ++_day)
 		{
@@ -360,14 +333,12 @@ const Room& randRoom(const Subject& _subject, Subject::SUBJECT_MODALITY _subMod)
 				auto vec = (*schedules)[_week][static_cast<Lesson::LESSON_DAY>(_day)][static_cast<Lesson::LESSON_SLOT>(_slot)];
 				for(const Lesson& lesson : vec)
 				{
-					std::cout << "{" << lesson.m_subject.m_name << " " << &lesson.m_room << " " << lesson.m_teacher << "} "; 
+					std::cout << lesson << std::endl; 
 				}
-				std::cout << std::endl;
 			}
 		}
-	}
+	}*/
 
-	exit(0);
 	Genome.m_schedules = (void*)schedules;
 \end
 
@@ -404,7 +375,7 @@ const Room& randRoom(const Subject& _subject, Subject::SUBJECT_MODALITY _subMod)
 \Default run parameters :         // Please let the parameters appear in this order
 Number of generations : 300       // NB_GEN
 Time limit: 0                     // In seconds, 0 to deactivate
-Population size : 2           // POP_SIZE
+Population size : 65536           // POP_SIZE
 Offspring size : 100%             // 40% 
 Mutation probability : 1          // MUT_PROB
 Crossover probability : 1         // XOVER_PROB

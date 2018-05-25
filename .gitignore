@@ -4,5 +4,5 @@ schedules
 *.mak
 *.o
 *.prm
-*.hpp
+schedulesIndividual.hpp
 *.dat

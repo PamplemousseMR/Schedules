@@ -32,21 +32,35 @@ public:
 
 	const ROOM_TYPE m_type;
 
-	const unsigned short m_capacity;
+	const std::string m_name;
 
 public:
 
 	Room(const Room&) = default;
 
-	Room& operator =(const Room&) = default;
+	Room& operator =(const Room&) = delete;
 
 	Room(Room&&) = default;
 
 	Room& operator =(Room&&) = default;
+	
+	friend std::ostream& operator <<(std::ostream& _o, const Room& _t)
+	{
+		std::string type; 
+		switch(_t.m_type) 
+		{ 
+			case ROOM: type = "ROOM_"; break; 
+			case AMPHI: type = "AMPHI_"; break; 
+			case LANGUAGE: type = "LANGUAGE_"; break; 
+			case COMPUTER: type = "COMPUTER_"; break; 
+			case LABORATORY: type = "LABORATORY_"; break;
+		} 
+		return _o << "Room_" << type << _t.m_name;
+	}
 
 private:
 
-	Room(ROOM_TYPE, unsigned short);
+	Room(ROOM_TYPE, const std::string&);
 
 };
 
@@ -56,32 +70,32 @@ private:
 
 const std::vector<Room> Room::s_rooms
 {
-	Room(AMPHI, 160),
-	Room(AMPHI, 160),
+	Room(AMPHI, "A"),
+	Room(AMPHI, "B"),
 
-	Room(ROOM, 40),
-	Room(ROOM, 40),
-	Room(ROOM, 40),
-	Room(ROOM, 40),
-	Room(ROOM, 40),
+	Room(ROOM, "A"),
+	Room(ROOM, "B"),
+	Room(ROOM, "C"),
+	Room(ROOM, "D"),
+	Room(ROOM, "E"),
 
-	Room(LANGUAGE, 20),
-	Room(LANGUAGE, 20),
-	Room(LANGUAGE, 20),
-	Room(LANGUAGE, 20),
-	Room(LANGUAGE, 20),
-	Room(LANGUAGE, 20),
-	Room(LANGUAGE, 20),
+	Room(LANGUAGE, "A"),
+	Room(LANGUAGE, "B"),
+	Room(LANGUAGE, "C"),
+	Room(LANGUAGE, "D"),
+	Room(LANGUAGE, "E"),
+	Room(LANGUAGE, "F"),
+	Room(LANGUAGE, "G"),
 
-	Room(COMPUTER, 20),
-	Room(COMPUTER, 20),
+	Room(COMPUTER, "A"),
+	Room(COMPUTER, "B"),
 
-	Room(LABORATORY, 20),
-	Room(LABORATORY, 20)
+	Room(LABORATORY, "A"),
+	Room(LABORATORY, "B")
 };
 
-Room::Room(ROOM_TYPE _type, unsigned short _capacity)
+Room::Room(ROOM_TYPE _type, const std::string& _name)
 	:	m_type(_type),
-		m_capacity(_capacity)
+		m_name(_name)
 {
 }

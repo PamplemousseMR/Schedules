@@ -73,11 +73,25 @@ public:
 
 	Subject(const Subject&) = default;
 
-	Subject& operator =(const Subject&) = default;
+	Subject& operator =(const Subject&) = delete;
 
 	Subject(Subject&&) = default;
 
 	Subject& operator =(Subject&&) = default;
+	
+	friend std::ostream& operator <<(std::ostream& _o, const Subject& _t)
+	{
+		std::string spe; 
+		switch(_t.m_speciality) 
+		{ 
+			case CHEMICAL: spe = "_CHEMICAL"; break; 
+			case COMPUTER: spe = "_COMPUTER"; break; 
+			case GEOPHYSICAL: spe = "_GEOPHYSICAL"; break; 
+			case OILNGAS: spe = "_OILNGAS"; break; 
+			case COMMUN: spe = "_COMMUN"; break; 
+		} 
+		return _o << _t.m_name << spe;
+	}
 
 private:
 

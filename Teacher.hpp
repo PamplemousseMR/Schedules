@@ -75,7 +75,7 @@ public:
 
 	Teacher(const Teacher&) = default;
 
-	Teacher& operator =(const Teacher&) = default;
+	Teacher& operator =(const Teacher&) = delete;
 
 	Teacher(Teacher&&) = default;
 
@@ -86,15 +86,14 @@ public:
 		std::string type; 
 		switch(_t.m_type) 
 		{ 
-			case MATHS: type = "MATHS"; break; 
-			case PHYSICS: type = "PHYSICS"; break; 
-			case COMPUTER: type = "COMPUTER"; break; 
-			case CHEMISTRY: type = "CHEMISTRY"; break; 
-			case ENGLISH: type = "ENGLISH"; break; 
-			case FRENCH: type = "FRENCH"; break; 
+			case MATHS: type = "MATHS_"; break; 
+			case PHYSICS: type = "PHYSICS_"; break; 
+			case COMPUTER: type = "COMPUTER_"; break; 
+			case CHEMISTRY: type = "CHEMISTRY_"; break; 
+			case ENGLISH: type = "ENGLISH_"; break; 
+			case FRENCH: type = "FRENCH_"; break; 
 		} 
-		_o << "[" << type << "_" << _t.m_name << "]";
-		return _o;
+		return _o << "Teacher_" << type << _t.m_name;
 	}
 
 private:

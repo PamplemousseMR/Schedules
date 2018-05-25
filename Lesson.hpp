@@ -39,7 +39,7 @@ public:
 
 public:
 
-	Lesson(const Subject&, const Teacher&, const Room&, std::initializer_list<Class>);
+	Lesson(const Subject&, const Teacher&, const Room&, const Class&, Subject::SUBJECT_MODALITY);
 
 	Lesson(const Lesson&) = default;
 
@@ -49,6 +49,20 @@ public:
 
 	Lesson& operator =(Lesson&&) = default;
 
+	friend std::ostream& operator <<(std::ostream& _o, const Lesson& _l)
+	{
+		std::string mod;
+		switch (_l.m_modality)
+		{ 
+			case Subject::CM: mod = "CM "; break; 
+			case Subject::CI: mod = "CI "; break; 
+			case Subject::TD: mod = "TD "; break; 
+			case Subject::TP: mod = "TP "; break; 
+			case Subject::MODALITY_SIZE: mod = ""; break; 
+		} 
+		return _o << "{ " << _l.m_subject << " " << _l.m_room << " " << _l.m_teacher << " " << _l.m_class << " }";
+	}
+
 public:
 
 	const Subject& m_subject;
@@ -57,7 +71,9 @@ public:
 
 	const Room& m_room;
 	
-	const std::vector<Class> m_class;
+	const Class& m_class;
+	
+	const Subject::SUBJECT_MODALITY m_modality;
 
 };
 
@@ -68,10 +84,11 @@ public:
 const float Lesson::SLOT_INTERVAL = 1.5f;
 
 Lesson::Lesson(const Subject& _subject, const Teacher& _teacher, const Room& _room,
-								std::initializer_list<Class> _classList)
+								const Class& _classList, Subject::SUBJECT_MODALITY _modality)
 	: 	m_subject(_subject),
 		m_teacher(_teacher),
 		m_room(_room),
-		m_class(_classList.begin(), _classList.end())
+		m_class(_classList),
+		m_modality(_modality)
 {
 }
