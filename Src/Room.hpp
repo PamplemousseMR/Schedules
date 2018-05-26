@@ -21,12 +21,13 @@ public:
 		AMPHI,
 		LANGUAGE,
 		COMPUTER,
-		LABORATORY
+		LABORATORY,
+		TYPE_SIZE
 	};
 
 public:
 
-	static const std::vector< Room > s_rooms;
+	static const std::map< ROOM_TYPE, const std::vector< Room > > s_rooms;
 
 public:
 
@@ -54,7 +55,8 @@ public:
 			case LANGUAGE: type = "LANGUAGE_"; break; 
 			case COMPUTER: type = "COMPUTER_"; break; 
 			case LABORATORY: type = "LABORATORY_"; break;
-		} 
+			case TYPE_SIZE: type = ""; break;
+		}
 		return _o << "Room_" << type << _t.m_name;
 	}
 
@@ -68,30 +70,51 @@ private:
 										Definition
 --------------------------------------------------------------------------------- */
 
-const std::vector<Room> Room::s_rooms
+const std::map< Room::ROOM_TYPE, const std::vector< Room > > Room::s_rooms
 {
-	Room(AMPHI, "A"),
-	Room(AMPHI, "B"),
+	{ AMPHI,
+		{	
+			Room(AMPHI, "A"),
+			Room(AMPHI, "B")
+	    }
+    },
 
-	Room(ROOM, "A"),
-	Room(ROOM, "B"),
-	Room(ROOM, "C"),
-	Room(ROOM, "D"),
-	Room(ROOM, "E"),
+	{ ROOM,
+		{	
+			Room(ROOM, "A"),
+			Room(ROOM, "B"),
+			Room(ROOM, "C"),
+			Room(ROOM, "D"),
+			Room(ROOM, "E")
+	    }
+    },
 
-	Room(LANGUAGE, "A"),
-	Room(LANGUAGE, "B"),
-	Room(LANGUAGE, "C"),
-	Room(LANGUAGE, "D"),
-	Room(LANGUAGE, "E"),
-	Room(LANGUAGE, "F"),
-	Room(LANGUAGE, "G"),
+    { LANGUAGE,
+		{	
+			Room(LANGUAGE, "A"),
+			Room(LANGUAGE, "B"),
+			Room(LANGUAGE, "C"),
+			Room(LANGUAGE, "D"),
+			Room(LANGUAGE, "E"),
+			Room(LANGUAGE, "F"),
+			Room(LANGUAGE, "G")
+	    }
+    },
 
-	Room(COMPUTER, "A"),
-	Room(COMPUTER, "B"),
+    { COMPUTER,
+		{	
+			Room(COMPUTER, "A"),
+			Room(COMPUTER, "B")
+	    }
+    },
 
-	Room(LABORATORY, "A"),
-	Room(LABORATORY, "B")
+    { LABORATORY,
+		{	
+			Room(LABORATORY, "A"),
+			Room(LABORATORY, "B")
+	    }
+    }
+	
 };
 
 Room::Room(ROOM_TYPE _type, const std::string& _name)

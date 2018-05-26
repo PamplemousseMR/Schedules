@@ -72,7 +72,6 @@ const Teacher& randTeacher(const Subject& _subject)
 		case Subject::FRENCH :
 			return Teacher::s_teachers.at(Teacher::FRENCH)[globalRandomGenerator->random(0, Teacher::s_teachers.at(Teacher::FRENCH).size())];
 		break;
-		case Subject::UNDEFINED :
 		default :
 			Teacher::TEACHERS_TYPE rand = static_cast< Teacher::TEACHERS_TYPE >(globalRandomGenerator->random(0, Teacher::TYPE_SIZE));
 			return Teacher::s_teachers.at(rand)[globalRandomGenerator->random(0, Teacher::s_teachers.at(rand).size())];
@@ -82,49 +81,47 @@ const Teacher& randTeacher(const Subject& _subject)
 
 const Room& randRoom(const Subject& _subject, Subject::SUBJECT_MODALITY _subMod)
 {
-	int min = 0, max = Room::s_rooms.size();
 	switch(_subMod) 
 	{
 		case Subject::TP :
 			switch(_subject.m_type)
 			{
 				case Subject::COMPUTER_SCIENCE :
-					min = 14;
-					max = 16;
+					return Room::s_rooms.at(Room::COMPUTER)[globalRandomGenerator->random(0, Room::s_rooms.at(Room::COMPUTER).size())];
 				break;
 				case Subject::PHYSICS :
 				case Subject::CHEMISTRY :
-					min = 16;
-					max = 18;
+					return Room::s_rooms.at(Room::LABORATORY)[globalRandomGenerator->random(0, Room::s_rooms.at(Room::LABORATORY).size())];
 				break;
 				case Subject::ENGLISH :
 				case Subject::FRENCH :
-					min = 7;
-					max = 14;
+					return Room::s_rooms.at(Room::LANGUAGE)[globalRandomGenerator->random(0, Room::s_rooms.at(Room::LANGUAGE).size())];
 				break;
-				case Subject::MATHS :
-				case Subject::UNDEFINED :
+				default :
+					Room::ROOM_TYPE rand = static_cast< Room::ROOM_TYPE >(globalRandomGenerator->random(0, Room::TYPE_SIZE));
+					return Room::s_rooms.at(rand)[globalRandomGenerator->random(0, Room::s_rooms.at(rand).size())];
 				break;
 			}
 		break;
 		case Subject::TD :
-			max = 7;
+			return Room::s_rooms.at(Room::ROOM)[globalRandomGenerator->random(0, Room::s_rooms.at(Room::ROOM).size())];
 		break;
 		case Subject::CI :
 		case Subject::CM :
 			if(_subject.m_speciality == Subject::COMMUN)
 			{
-				max = 2;
+				return Room::s_rooms.at(Room::AMPHI)[globalRandomGenerator->random(0, Room::s_rooms.at(Room::AMPHI).size())];
 			}
 			else
 			{
-				max = 7;
+				return Room::s_rooms.at(Room::ROOM)[globalRandomGenerator->random(0, Room::s_rooms.at(Room::ROOM).size())];
 			}
 		break;
-		case Subject::MODALITY_SIZE :
+		default :
+			Room::ROOM_TYPE rand = static_cast< Room::ROOM_TYPE >(globalRandomGenerator->random(0, Room::TYPE_SIZE));
+			return Room::s_rooms.at(rand)[globalRandomGenerator->random(0, Room::s_rooms.at(rand).size())];
 		break;
 	}
-	return Room::s_rooms[globalRandomGenerator->random(min, max)];
 }
 
 int countTeacher(const Teacher& _teacher, const std::vector<Lesson>& _liste)
@@ -134,7 +131,7 @@ int countTeacher(const Teacher& _teacher, const std::vector<Lesson>& _liste)
 	{
 		if(&lesson.m_teacher == &_teacher)
 		{
-			result += 1;
+			++result;
 		}	
 	}
 	return result;
@@ -147,7 +144,7 @@ int countRoom(const Room& _room, const std::vector<Lesson>& _liste)
 	{
 		if(&lesson.m_room == &_room)
 		{
-			result += 1;
+			++result;
 		}	
 	}
 	return result;
