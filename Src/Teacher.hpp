@@ -22,18 +22,15 @@ class Teacher
 
 public:
 
-	static const std::vector< Teacher > s_teachers;
-
-public:
-
 	enum TEACHERS_TYPE
 	{
 		MATHS,
 		PHYSICS,
-		COMPUTER,
+		COMPUTER_SCIENCE,
 		CHEMISTRY,
 		ENGLISH,
-		FRENCH
+		FRENCH,
+		TYPE_SIZE
 	};
 
 	enum TEACHERS_TIME
@@ -63,6 +60,10 @@ public:
 
 public:
 
+	static const std::map< TEACHERS_TYPE, const std::vector< Teacher > > s_teachers;
+
+public:
+
 	const TEACHERS_TYPE m_type;
 
 	const TEACHERS_TIME m_time;
@@ -88,10 +89,11 @@ public:
 		{ 
 			case MATHS: type = "MATHS_"; break; 
 			case PHYSICS: type = "PHYSICS_"; break; 
-			case COMPUTER: type = "COMPUTER_"; break; 
+			case COMPUTER_SCIENCE: type = "COMPUTER_SCIENCE_"; break; 
 			case CHEMISTRY: type = "CHEMISTRY_"; break; 
 			case ENGLISH: type = "ENGLISH_"; break; 
 			case FRENCH: type = "FRENCH_"; break; 
+			case TYPE_SIZE: type = ""; break;
 		} 
 		return _o << "Teacher_" << type << _t.m_name;
 	}
@@ -117,37 +119,62 @@ void variadic_map_emplace(std::map< T,std::map< F,G > >& v, First&& first, Secon
 	variadic_map_emplace(v, std::forward< Args >(args)...);
 }
 
-const std::vector< Teacher > Teacher::s_teachers
+const std::map< Teacher::TEACHERS_TYPE, const std::vector< Teacher > > Teacher::s_teachers
 {
-	Teacher(MATHS, FULL, "A", MONDAY, SLOT_0, TUESDAY, SLOT_0, WEDNESDAY, SLOT_0, THURSDAY, SLOT_0, FRIDAY, SLOT_0), 
-    Teacher(MATHS, FULL, "B", MONDAY, SLOT_2, MONDAY, SLOT_3, TUESDAY, SLOT_2, TUESDAY, SLOT_3, FRIDAY, SLOT_2, FRIDAY, SLOT_3), 
-    Teacher(MATHS, FULL, "C", FRIDAY, SLOT_2), 
+	{ MATHS,
+		{	
+			Teacher(MATHS, FULL, "A", MONDAY, SLOT_0, TUESDAY, SLOT_0, WEDNESDAY, SLOT_0, THURSDAY, SLOT_0, FRIDAY, SLOT_0), 
+	    	Teacher(MATHS, FULL, "B", MONDAY, SLOT_2, MONDAY, SLOT_3, TUESDAY, SLOT_2, TUESDAY, SLOT_3, FRIDAY, SLOT_2, FRIDAY, SLOT_3), 
+	    	Teacher(MATHS, FULL, "C", FRIDAY, SLOT_2)
+	    }
+    },
+
+    { PHYSICS,
+		{	
+			Teacher(PHYSICS, FULL, "A", MONDAY, SLOT_0, TUESDAY, SLOT_0, WEDNESDAY, SLOT_0, THURSDAY, SLOT_0, FRIDAY, SLOT_0), 
+		    Teacher(PHYSICS, FULL, "B", MONDAY, SLOT_2, MONDAY, SLOT_3, TUESDAY, SLOT_2, TUESDAY, SLOT_3, WEDNESDAY, SLOT_2, WEDNESDAY, SLOT_3, THURSDAY, SLOT_2, THURSDAY, SLOT_3, FRIDAY, SLOT_2, FRIDAY, SLOT_3), 
+		    Teacher(PHYSICS, HALF, "C", MONDAY, SLOT_0, MONDAY, SLOT_1, MONDAY, SLOT_2, MONDAY, SLOT_3, TUESDAY, SLOT_0, TUESDAY, SLOT_1, TUESDAY, SLOT_2, TUESDAY, SLOT_3, WEDNESDAY, SLOT_0, WEDNESDAY, SLOT_1, WEDNESDAY, SLOT_2, WEDNESDAY, SLOT_3, THURSDAY, SLOT_2, THURSDAY, SLOT_3, FRIDAY, SLOT_0, FRIDAY, SLOT_1), 
+		    Teacher(PHYSICS, HOUR, "D")
+	    }
+    } ,
+
+    { COMPUTER_SCIENCE,
+		{	
+			Teacher(COMPUTER_SCIENCE, FULL, "A"),  
+		    Teacher(COMPUTER_SCIENCE, FULL, "B"),  
+		    Teacher(COMPUTER_SCIENCE, HALF, "C"),  
+		    Teacher(COMPUTER_SCIENCE, HOUR, "D", MONDAY, SLOT_0, MONDAY, SLOT_1, MONDAY, SLOT_2, MONDAY, SLOT_3, FRIDAY, SLOT_0, FRIDAY, SLOT_1, FRIDAY, SLOT_2, FRIDAY, SLOT_3),  
+	    }
+    } ,
  
-    Teacher(PHYSICS, FULL, "A", MONDAY, SLOT_0, TUESDAY, SLOT_0, WEDNESDAY, SLOT_0, THURSDAY, SLOT_0, FRIDAY, SLOT_0), 
-    Teacher(PHYSICS, FULL, "B", MONDAY, SLOT_2, MONDAY, SLOT_3, TUESDAY, SLOT_2, TUESDAY, SLOT_3, WEDNESDAY, SLOT_2, WEDNESDAY, SLOT_3, THURSDAY, SLOT_2, THURSDAY, SLOT_3, FRIDAY, SLOT_2, FRIDAY, SLOT_3), 
-    Teacher(PHYSICS, HALF, "C", MONDAY, SLOT_0, MONDAY, SLOT_1, MONDAY, SLOT_2, MONDAY, SLOT_3, TUESDAY, SLOT_0, TUESDAY, SLOT_1, TUESDAY, SLOT_2, TUESDAY, SLOT_3, WEDNESDAY, SLOT_0, WEDNESDAY, SLOT_1, WEDNESDAY, SLOT_2, WEDNESDAY, SLOT_3, THURSDAY, SLOT_2, THURSDAY, SLOT_3, FRIDAY, SLOT_0, FRIDAY, SLOT_1), 
-    Teacher(PHYSICS, HOUR, "D"), 
+    { CHEMISTRY,
+		{	
+			Teacher(CHEMISTRY, FULL, "A", MONDAY, SLOT_0, TUESDAY, SLOT_0, WEDNESDAY, SLOT_0, THURSDAY, SLOT_0, FRIDAY, SLOT_0), 
+		    Teacher(CHEMISTRY, FULL, "B"), 
+		    Teacher(CHEMISTRY, HALF, "C"), 
+		    Teacher(CHEMISTRY, HALF, "D", MONDAY, SLOT_0, TUESDAY, SLOT_0, WEDNESDAY, SLOT_0, THURSDAY, SLOT_0, FRIDAY, SLOT_0)
+	    }
+    },
  
-    Teacher(COMPUTER, FULL, "A"), 
-    Teacher(COMPUTER, FULL, "B"), 
-    Teacher(COMPUTER, HALF, "C"), 
-    Teacher(COMPUTER, HOUR, "D", MONDAY, SLOT_0, MONDAY, SLOT_1, MONDAY, SLOT_2, MONDAY, SLOT_3, FRIDAY, SLOT_0, FRIDAY, SLOT_1, FRIDAY, SLOT_2, FRIDAY, SLOT_3), 
+    { ENGLISH,
+		{	
+			Teacher(ENGLISH, FULL, "A"), 
+		    Teacher(ENGLISH, FULL, "B"), 
+		    Teacher(ENGLISH, HALF, "C"), 
+		    Teacher(ENGLISH, FULL, "D")
+	    }
+    },
+
+    { FRENCH,
+		{	
+			Teacher(FRENCH, FULL, "A"), 
+		    Teacher(FRENCH, FULL, "B"), 
+		    Teacher(FRENCH, HALF, "C"), 
+		    Teacher(FRENCH, HALF, "D"), 
+		    Teacher(FRENCH, HOUR, "E")
+	    }
+    }
  
-    Teacher(CHEMISTRY, FULL, "A", MONDAY, SLOT_0, TUESDAY, SLOT_0, WEDNESDAY, SLOT_0, THURSDAY, SLOT_0, FRIDAY, SLOT_0), 
-    Teacher(CHEMISTRY, FULL, "B"), 
-    Teacher(CHEMISTRY, HALF, "C"), 
-    Teacher(CHEMISTRY, HALF, "D", MONDAY, SLOT_0, TUESDAY, SLOT_0, WEDNESDAY, SLOT_0, THURSDAY, SLOT_0, FRIDAY, SLOT_0), 
- 
-    Teacher(ENGLISH, FULL, "A"), 
-    Teacher(ENGLISH, FULL, "B"), 
-    Teacher(ENGLISH, HALF, "C"), 
-    Teacher(ENGLISH, FULL, "D"), 
- 
-    Teacher(FRENCH, FULL, "A"), 
-    Teacher(FRENCH, FULL, "B"), 
-    Teacher(FRENCH, HALF, "C"), 
-    Teacher(FRENCH, HALF, "D"), 
-    Teacher(FRENCH, HOUR, "E")
 };
 
 template < typename... Args >

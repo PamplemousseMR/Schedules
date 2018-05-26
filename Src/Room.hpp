@@ -15,10 +15,6 @@ class Room
 
 public:
 
-	static const std::vector< Room > s_rooms;
-
-public:
-
 	enum ROOM_TYPE
 	{
 		ROOM,
@@ -27,6 +23,10 @@ public:
 		COMPUTER,
 		LABORATORY
 	};
+
+public:
+
+	static const std::vector< Room > s_rooms;
 
 public:
 

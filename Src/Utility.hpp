@@ -53,34 +53,31 @@ std::vector< T > shuffleVector(const std::vector< T >& _vec)
 
 const Teacher& randTeacher(const Subject& _subject)
 {
-	int min = 0, max = Teacher::s_teachers.size();
 	switch (_subject.m_type){
 		case Subject::MATHS :
-			max = 3;
+			return Teacher::s_teachers.at(Teacher::MATHS)[globalRandomGenerator->random(0, Teacher::s_teachers.at(Teacher::MATHS).size())];
 		break;
 		case Subject::PHYSICS :
-			min = 3;
-			max = 7;
+			return Teacher::s_teachers.at(Teacher::PHYSICS)[globalRandomGenerator->random(0, Teacher::s_teachers.at(Teacher::PHYSICS).size())];
 		break;
 		case Subject::COMPUTER_SCIENCE :
-			min = 7;
-			max = 11;
+			return Teacher::s_teachers.at(Teacher::COMPUTER_SCIENCE)[globalRandomGenerator->random(0, Teacher::s_teachers.at(Teacher::COMPUTER_SCIENCE).size())];
 		break;
 		case Subject::CHEMISTRY :
-			min = 11;
-			max = 15;
+			return Teacher::s_teachers.at(Teacher::CHEMISTRY)[globalRandomGenerator->random(0, Teacher::s_teachers.at(Teacher::CHEMISTRY).size())];
 		break;
 		case Subject::ENGLISH :
-			min = 15;
-			max = 19;
+			return Teacher::s_teachers.at(Teacher::ENGLISH)[globalRandomGenerator->random(0, Teacher::s_teachers.at(Teacher::ENGLISH).size())];
 		break;
 		case Subject::FRENCH :
-			min = 19;
+			return Teacher::s_teachers.at(Teacher::FRENCH)[globalRandomGenerator->random(0, Teacher::s_teachers.at(Teacher::FRENCH).size())];
 		break;
 		case Subject::UNDEFINED :
+		default :
+			Teacher::TEACHERS_TYPE rand = static_cast< Teacher::TEACHERS_TYPE >(globalRandomGenerator->random(0, Teacher::TYPE_SIZE));
+			return Teacher::s_teachers.at(rand)[globalRandomGenerator->random(0, Teacher::s_teachers.at(rand).size())];
 		break;
 	}
-	return Teacher::s_teachers[globalRandomGenerator->random(min, max)];
 }
 
 const Room& randRoom(const Subject& _subject, Subject::SUBJECT_MODALITY _subMod)

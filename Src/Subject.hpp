@@ -16,10 +16,6 @@ class Subject
 
 public:
 	
-	static const std::vector< Subject > s_subjects;
-
-public:
-	
 	enum SUBJECT_SPECIALITY
 	{
 		CHEMICAL,
@@ -56,6 +52,10 @@ public:
 		TP,
 		MODALITY_SIZE
 	};
+
+public:
+	
+	static const std::vector< Subject > s_subjects;
 
 public:
 	

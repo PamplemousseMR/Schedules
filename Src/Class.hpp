@@ -15,20 +15,6 @@ class Class
 
 public:
 
-	static const std::vector< Class > s_classes;
-
-	static const unsigned short s_L0Count;
-
-	static const unsigned short s_L0Offset;
-
-	static const unsigned short s_L1Count;
-
-	static const unsigned short s_L1Offset;
-						
-	static const unsigned short s_specialityPerYeer;
-
-public:
-
 	enum CLASS_YEAR
 	{
 		L0,
@@ -50,6 +36,20 @@ public:
 		B,
 		ALL
 	};
+
+public:
+
+	static const std::vector< Class > s_classes;
+
+	static const unsigned short s_L0Count;
+
+	static const unsigned short s_L0Offset;
+
+	static const unsigned short s_L1Count;
+
+	static const unsigned short s_L1Offset;
+						
+	static const unsigned short s_specialityPerYeer;
 
 public:
 

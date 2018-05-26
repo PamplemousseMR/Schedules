@@ -16,10 +16,6 @@ class Lesson
 
 public:
 
-	static const float SLOT_INTERVAL;
-
-public:
-
 	enum LESSON_DAY
 	{
 		MONDAY,
@@ -38,6 +34,11 @@ public:
 		SLOT_3,
 		SLOT_SIZE
 	};
+
+
+public:
+
+	static const float SLOT_INTERVAL;
 
 public:
 
