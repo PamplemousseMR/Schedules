@@ -3,11 +3,12 @@
 #include <utility>
 #include <functional>
 
-#include "Teacher.hpp"
-#include "Room.hpp"
-#include "Subject.hpp"
-#include "Class.hpp"
-#include "Lesson.hpp"
+#include "Src/Teacher.hpp"
+#include "Src/Room.hpp"
+#include "Src/Subject.hpp"
+#include "Src/Class.hpp"
+#include "Src/Lesson.hpp"
+#include "Src/Utility.hpp"
 
 /* ---------------------------------------------------------------------------------
 										Schedules
@@ -23,112 +24,15 @@ typedef std::map<int, Week> Schedules;
 
 static const std::vector< std::tuple< Subject::SUBJECT_MODALITY, const Subject&, const Class& > > s_MAP;
 
+static const unsigned short s_STRONG_CONSTRAINT = 2;
+static const unsigned short s_WEAK_CONSTRAINT = 1;
+
 \end
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
 \User functions:
-
-template<typename T>
-std::vector<T> shuffleVector(const std::vector<T>& _vec)
-{
-	std::vector<size_t> value;
-	for(size_t i=0 ; i<_vec.size() ; ++i)	
-	{
-		value.push_back(i);
-	}
-
-	std::vector<T> result;
-	while(!value.empty())
-	{
-		unsigned rand = random(0, value.size());
-		result.push_back(_vec[value[rand]]);
-		value.erase(value.begin()+rand);
-	}
-
-	return result;
-}
-
-const Teacher& randTeacher(const Subject& _subject)
-{
-	int min = 0, max = Teacher::s_teachers.size();
-	switch (_subject.m_type){
-		case Subject::MATHS :
-			max = 3;
-		break;
-		case Subject::PHYSICS :
-			min = 3;
-			max = 7;
-		break;
-		case Subject::COMPUTER_SCIENCE :
-			min = 7;
-			max = 11;
-		break;
-		case Subject::CHEMISTRY :
-			min = 11;
-			max = 15;
-		break;
-		case Subject::ENGLISH :
-			min = 15;
-			max = 19;
-		break;
-		case Subject::FRENCH :
-			min = 19;
-		break;
-		case Subject::UNDEFINED :
-		break;
-	}
-	return Teacher::s_teachers[random(min, max)];
-}
-
-const Room& randRoom(const Subject& _subject, Subject::SUBJECT_MODALITY _subMod)
-{
-	int min = 0, max = Room::s_rooms.size();
-	switch(_subMod) 
-	{
-		case Subject::TP :
-			switch(_subject.m_type)
-			{
-				case Subject::COMPUTER_SCIENCE :
-					min = 14;
-					max = 16;
-				break;
-				case Subject::PHYSICS :
-				case Subject::CHEMISTRY :
-					min = 16;
-					max = 18;
-				break;
-				case Subject::ENGLISH :
-				case Subject::FRENCH :
-					min = 7;
-					max = 14;
-				break;
-				case Subject::MATHS :
-				case Subject::UNDEFINED :
-				break;
-			}
-		break;
-		case Subject::TD :
-			max = 7;
-		break;
-		case Subject::CI :
-		case Subject::CM :
-			if(_subject.m_speciality == Subject::COMMUN)
-			{
-				max = 2;
-			}
-			else
-			{
-				max = 7;
-			}
-		break;
-		case Subject::MODALITY_SIZE :
-		break;
-	}
-	return Room::s_rooms[random(min, max)];
-}
-
 \end
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -340,6 +244,7 @@ const Room& randRoom(const Subject& _subject, Subject::SUBJECT_MODALITY _subMod)
 	}*/
 
 	Genome.m_schedules = (void*)schedules;
+
 \end
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -366,7 +271,7 @@ const Room& randRoom(const Subject& _subject, Subject::SUBJECT_MODALITY _subMod)
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
 \User Makefile options:
-	CPPFLAGS += -std=c++11 -g
+	CPPFLAGS += -std=c++11 -o3
 \end
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------
