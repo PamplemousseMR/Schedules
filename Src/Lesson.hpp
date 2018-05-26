@@ -69,13 +69,13 @@ public:
 		std::string mod;
 		switch (_l.m_modality)
 		{ 
-			case Subject::CM: mod = "CM "; break; 
-			case Subject::CI: mod = "CI "; break; 
-			case Subject::TD: mod = "TD "; break; 
-			case Subject::TP: mod = "TP "; break; 
+			case Subject::CM: mod = "CM"; break; 
+			case Subject::CI: mod = "CI"; break; 
+			case Subject::TD: mod = "TD"; break; 
+			case Subject::TP: mod = "TP"; break; 
 			case Subject::MODALITY_SIZE: mod = ""; break; 
 		} 
-		return _o << "{ " << _l.m_subject << " " << _l.m_room << " " << _l.m_teacher << " " << _l.m_class << " }";
+		return _o << "{ " << "[" << mod << "] " << _l.m_subject << " " << _l.m_room << " " << _l.m_teacher << " " << _l.m_class << " }";
 	}
 
 };

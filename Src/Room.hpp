@@ -27,7 +27,7 @@ public:
 
 public:
 
-	static const std::map< ROOM_TYPE, const std::vector< Room > > s_rooms;
+	static const std::map< const ROOM_TYPE, const std::vector< Room > > s_rooms;
 
 public:
 
@@ -70,7 +70,7 @@ private:
 										Definition
 --------------------------------------------------------------------------------- */
 
-const std::map< Room::ROOM_TYPE, const std::vector< Room > > Room::s_rooms
+const std::map< const Room::ROOM_TYPE, const std::vector< Room > > Room::s_rooms
 {
 	{ AMPHI,
 		{	
@@ -78,7 +78,6 @@ const std::map< Room::ROOM_TYPE, const std::vector< Room > > Room::s_rooms
 			Room(AMPHI, "B")
 	    }
     },
-
 	{ ROOM,
 		{	
 			Room(ROOM, "A"),
@@ -88,7 +87,6 @@ const std::map< Room::ROOM_TYPE, const std::vector< Room > > Room::s_rooms
 			Room(ROOM, "E")
 	    }
     },
-
     { LANGUAGE,
 		{	
 			Room(LANGUAGE, "A"),
@@ -100,21 +98,18 @@ const std::map< Room::ROOM_TYPE, const std::vector< Room > > Room::s_rooms
 			Room(LANGUAGE, "G")
 	    }
     },
-
     { COMPUTER,
 		{	
 			Room(COMPUTER, "A"),
 			Room(COMPUTER, "B")
 	    }
     },
-
     { LABORATORY,
 		{	
 			Room(LABORATORY, "A"),
 			Room(LABORATORY, "B")
 	    }
     }
-	
 };
 
 Room::Room(ROOM_TYPE _type, const std::string& _name)

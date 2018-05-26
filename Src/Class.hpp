@@ -5,6 +5,8 @@
 --------------------------------------------------------------------------------- */
 
 #include <vector>
+#include <map>
+#include <tuple>
 
 /* ---------------------------------------------------------------------------------
 										Declaration
@@ -37,19 +39,11 @@ public:
 		ALL
 	};
 
+	typedef std::tuple< const std::map< const Class::CLASS_YEAR, const Class >, const std::map< const Class::CLASS_YEAR, const std::map< const Class::CLASS_SPE, Class > >, const std::map< const  Class::CLASS_YEAR, const std::map< const  Class::CLASS_SPE, std::map< const Class::CLASS_GROUP, const Class > > > > ContainerType;
+
 public:
 
-	static const std::vector< Class > s_classes;
-
-	static const unsigned short s_L0Count;
-
-	static const unsigned short s_L0Offset;
-
-	static const unsigned short s_L1Count;
-
-	static const unsigned short s_L1Offset;
-						
-	static const unsigned short s_specialityPerYeer;
+	static const ContainerType s_classes;
 
 public:
 
@@ -109,46 +103,88 @@ private:
 										Definition
 --------------------------------------------------------------------------------- */
 
-const unsigned short Class::s_L0Count = 8;
-
-const unsigned short Class::s_L0Offset = 0;
-
-const unsigned short Class::s_L1Count = 8;
-
-const unsigned short Class::s_L1Offset = Class::s_L0Count + Class::s_L0Offset;
-		
-const unsigned short Class::s_specialityPerYeer = 4;
-
-const std::vector<Class> Class::s_classes
+const Class::ContainerType Class::s_classes
 {
-	Class(L0, SPE_ALL, ALL),
-	Class(L1, SPE_ALL, ALL),
-	
-	Class(L0, SPE_A, ALL),
-	Class(L0, SPE_B, ALL),
-	Class(L0, SPE_C, ALL),
-	Class(L0, SPE_D, ALL),
-	Class(L1, SPE_A, ALL),
-	Class(L1, SPE_B, ALL),
-	Class(L1, SPE_C, ALL),
-	Class(L1, SPE_D, ALL),
-	
-	Class(L0, SPE_A, A),
-	Class(L0, SPE_A, B),
-	Class(L0, SPE_B, A),
-	Class(L0, SPE_B, B),
-	Class(L0, SPE_C, A),
-	Class(L0, SPE_C, B),
-	Class(L0, SPE_D, A),
-	Class(L0, SPE_D, B),
-	Class(L1, SPE_A, A),
-	Class(L1, SPE_A, B),
-	Class(L1, SPE_B, A),
-	Class(L1, SPE_B, B),
-	Class(L1, SPE_C, A),
-	Class(L1, SPE_C, B),
-	Class(L1, SPE_D, A),
-	Class(L1, SPE_D, B)
+	{ 
+		{L0, Class(L0, SPE_ALL, ALL)},
+		{L1, Class(L1, SPE_ALL, ALL)}
+	},
+	{
+		{ L0,
+			{
+				{SPE_A, Class(L0, SPE_A, ALL)},
+				{SPE_B, Class(L0, SPE_B, ALL)},
+				{SPE_C, Class(L0, SPE_C, ALL)},
+				{SPE_D, Class(L0, SPE_D, ALL)}
+			}
+		},
+		{ L1,
+			{
+				{SPE_A, Class(L1, SPE_A, ALL)},
+				{SPE_B, Class(L1, SPE_B, ALL)},
+				{SPE_C, Class(L1, SPE_C, ALL)},
+				{SPE_D, Class(L1, SPE_D, ALL)}
+			}
+		}
+	},
+	{
+		{ L0,
+			{
+				{ SPE_A, 
+					{
+						{A, Class(L0, SPE_A, A)},
+						{B, Class(L0, SPE_A, B)}
+					}
+				},
+				{ SPE_B, 
+					{
+						{A, Class(L0, SPE_B, A)},
+						{B, Class(L0, SPE_B, B)}
+					}
+				},
+				{ SPE_C, 
+					{
+						{A, Class(L0, SPE_C, A)},
+						{B, Class(L0, SPE_C, B)}
+					}
+				},
+				{ SPE_D, 
+					{
+						{A, Class(L0, SPE_D, A)},
+						{B, Class(L0, SPE_D, B)}
+					}
+				}
+			}
+		},
+		{ L1,
+			{
+				{ SPE_A, 
+					{
+						{A, Class(L1, SPE_A, A)},
+						{B, Class(L1, SPE_A, B)}
+					}
+				},
+				{ SPE_B, 
+					{
+						{A, Class(L1, SPE_B, A)},
+						{B, Class(L1, SPE_B, B)}
+					}
+				},
+				{ SPE_C, 
+					{
+						{A, Class(L1, SPE_C, A)},
+						{B, Class(L1, SPE_C, B)}
+					}
+				},
+				{ SPE_D, 
+					{
+						{A, Class(L1, SPE_D, A)},
+						{B, Class(L1, SPE_D, B)}
+					}
+				}
+			}
+		}
+	}
 };
 
 Class::Class(CLASS_YEAR _year, CLASS_SPE _spe, CLASS_GROUP _group)

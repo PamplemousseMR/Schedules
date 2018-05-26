@@ -60,7 +60,7 @@ public:
 
 public:
 
-	static const std::map< TEACHERS_TYPE, const std::vector< Teacher > > s_teachers;
+	static const std::map< const TEACHERS_TYPE, const std::vector< Teacher > > s_teachers;
 
 public:
 
@@ -70,7 +70,7 @@ public:
 
 	const std::string m_name;
 
-	const std::map< TEACHERS_DAY, std::map<TEACHERS_SLOT, bool> > m_availability;
+	const std::map< TEACHERS_DAY, std::map< TEACHERS_SLOT, bool > > m_availability;
 
 public:
 
@@ -119,7 +119,7 @@ void variadic_map_emplace(std::map< T,std::map< F,G > >& v, First&& first, Secon
 	variadic_map_emplace(v, std::forward< Args >(args)...);
 }
 
-const std::map< Teacher::TEACHERS_TYPE, const std::vector< Teacher > > Teacher::s_teachers
+const std::map< const Teacher::TEACHERS_TYPE, const std::vector< Teacher > > Teacher::s_teachers
 {
 	{ MATHS,
 		{	
@@ -128,7 +128,6 @@ const std::map< Teacher::TEACHERS_TYPE, const std::vector< Teacher > > Teacher::
 	    	Teacher(MATHS, FULL, "C", FRIDAY, SLOT_2)
 	    }
     },
-
     { PHYSICS,
 		{	
 			Teacher(PHYSICS, FULL, "A", MONDAY, SLOT_0, TUESDAY, SLOT_0, WEDNESDAY, SLOT_0, THURSDAY, SLOT_0, FRIDAY, SLOT_0), 
@@ -137,7 +136,6 @@ const std::map< Teacher::TEACHERS_TYPE, const std::vector< Teacher > > Teacher::
 		    Teacher(PHYSICS, HOUR, "D")
 	    }
     } ,
-
     { COMPUTER_SCIENCE,
 		{	
 			Teacher(COMPUTER_SCIENCE, FULL, "A"),  
@@ -155,7 +153,6 @@ const std::map< Teacher::TEACHERS_TYPE, const std::vector< Teacher > > Teacher::
 		    Teacher(CHEMISTRY, HALF, "D", MONDAY, SLOT_0, TUESDAY, SLOT_0, WEDNESDAY, SLOT_0, THURSDAY, SLOT_0, FRIDAY, SLOT_0)
 	    }
     },
- 
     { ENGLISH,
 		{	
 			Teacher(ENGLISH, FULL, "A"), 
@@ -164,7 +161,6 @@ const std::map< Teacher::TEACHERS_TYPE, const std::vector< Teacher > > Teacher::
 		    Teacher(ENGLISH, FULL, "D")
 	    }
     },
-
     { FRENCH,
 		{	
 			Teacher(FRENCH, FULL, "A"), 
@@ -174,7 +170,6 @@ const std::map< Teacher::TEACHERS_TYPE, const std::vector< Teacher > > Teacher::
 		    Teacher(FRENCH, HOUR, "E")
 	    }
     }
- 
 };
 
 template < typename... Args >
