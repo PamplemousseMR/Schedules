@@ -16,7 +16,7 @@ class Subject
 
 public:
 	
-	static const std::vector<Subject> s_subjects;
+	static const std::vector< Subject > s_subjects;
 
 public:
 	

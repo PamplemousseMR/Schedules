@@ -15,7 +15,7 @@ class Room
 
 public:
 
-	static const std::vector<Room> s_rooms;
+	static const std::vector< Room > s_rooms;
 
 public:
 

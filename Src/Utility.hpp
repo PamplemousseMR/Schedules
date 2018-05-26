@@ -30,16 +30,16 @@ int countRoom(const Room&, const std::vector<Lesson>&);
 										Definition
 --------------------------------------------------------------------------------- */
 
-template<typename T>
-std::vector<T> shuffleVector(const std::vector<T>& _vec)
+template< typename T >
+std::vector< T > shuffleVector(const std::vector< T >& _vec)
 {
-	std::vector<size_t> value;
+	std::vector< size_t > value;
 	for(size_t i=0 ; i<_vec.size() ; ++i)	
 	{
 		value.push_back(i);
 	}
 
-	std::vector<T> result;
+	std::vector< T > result;
 	while(!value.empty())
 	{
 		unsigned rand = globalRandomGenerator->random(0, value.size());

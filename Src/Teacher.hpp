@@ -11,18 +11,18 @@
 										Declaration
 --------------------------------------------------------------------------------- */
 
-template <typename T, typename F, typename G>
-static void variadic_map_emplace(std::map<T,std::map<F,G>>&);
+template < typename T, typename F, typename G >
+static void variadic_map_emplace(std::map< T,std::map< F,G > >&);
 
-template <typename T, typename F, typename G, typename First, typename Second, typename... Args>
-static void variadic_map_emplace(std::map<T,std::map<F,G>>&, First&&, Second&&, Args&&...);
+template < typename T, typename F, typename G, typename First, typename Second, typename... Args >
+static void variadic_map_emplace(std::map< T,std::map< F,G > >&, First&&, Second&&, Args&&...);
 
 class Teacher
 {
 
 public:
 
-	static const std::vector<Teacher> s_teachers;
+	static const std::vector< Teacher > s_teachers;
 
 public:
 
@@ -98,7 +98,7 @@ public:
 
 private:
 
-	template <typename... Args>
+	template < typename... Args >
 	Teacher(TEACHERS_TYPE, TEACHERS_TIME, const std::string&, Args&&...);
 
 };
@@ -107,17 +107,17 @@ private:
 										Definition
 --------------------------------------------------------------------------------- */
 
-template <typename T, typename F, typename G>
-void variadic_map_emplace(std::map<T,std::map<F,G>>&) {}
+template < typename T, typename F, typename G >
+void variadic_map_emplace(std::map< T,std::map< F,G > >&) {}
 
-template <typename T, typename F, typename G, typename First, typename Second, typename... Args>
-void variadic_map_emplace(std::map<T,std::map<F,G>>& v, First&& first, Second&& second, Args&&... args)
+template < typename T, typename F, typename G, typename First, typename Second, typename... Args >
+void variadic_map_emplace(std::map< T,std::map< F,G > >& v, First&& first, Second&& second, Args&&... args)
 {
-	v[std::forward<First>(first)][std::forward<Second>(second)] = false;
-	variadic_map_emplace(v, std::forward<Args>(args)...);
+	v[std::forward< First >(first)][std::forward< Second >(second)] = false;
+	variadic_map_emplace(v, std::forward< Args >(args)...);
 }
 
-const std::vector<Teacher> Teacher::s_teachers
+const std::vector< Teacher > Teacher::s_teachers
 {
 	Teacher(MATHS, FULL, "A", MONDAY, SLOT_0, TUESDAY, SLOT_0, WEDNESDAY, SLOT_0, THURSDAY, SLOT_0, FRIDAY, SLOT_0), 
     Teacher(MATHS, FULL, "B", MONDAY, SLOT_2, MONDAY, SLOT_3, TUESDAY, SLOT_2, TUESDAY, SLOT_3, FRIDAY, SLOT_2, FRIDAY, SLOT_3), 
@@ -150,7 +150,7 @@ const std::vector<Teacher> Teacher::s_teachers
     Teacher(FRENCH, HOUR, "E")
 };
 
-template <typename... Args>
+template < typename... Args >
 Teacher::Teacher(TEACHERS_TYPE _type, TEACHERS_TIME _time, const std::string& _name, Args&&... _notAvailable)
 	: 	m_type(_type),
 		m_time(_time),

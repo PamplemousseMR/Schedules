@@ -15,7 +15,7 @@ class Class
 
 public:
 
-	static const std::vector<Class> s_classes;
+	static const std::vector< Class > s_classes;
 
 	static const unsigned short s_L0Count;
 

@@ -18,9 +18,9 @@ static const unsigned short WEEK_BY_SEMESTER = 14;
 static const unsigned short MAX_HOUR_PER_WEEK = 30;
 static const unsigned short MAX_HOUR_PER_DAY = 6; 
 
-typedef std::map<Lesson::LESSON_SLOT, std::vector<Lesson>> Day;
-typedef std::map<Lesson::LESSON_DAY, Day> Week;
-typedef std::map<int, Week> Schedules; 
+typedef std::map< Lesson::LESSON_SLOT, std::vector< Lesson > > Day;
+typedef std::map< Lesson::LESSON_DAY, Day > Week;
+typedef std::map< int, Week > Schedules; 
 
 static const std::vector< std::tuple< Subject::SUBJECT_MODALITY, const Subject&, const Class& > > s_MAP;
 
@@ -53,7 +53,7 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 		const Subject& subject = Subject::s_subjects[i]; 
 		for(int modality = 0 ; modality < Subject::MODALITY_SIZE ; ++modality)
 		{
-			Subject::SUBJECT_MODALITY mod = static_cast<Subject::SUBJECT_MODALITY>(modality);
+			Subject::SUBJECT_MODALITY mod = static_cast< Subject::SUBJECT_MODALITY >(modality);
 			float number = subject.m_modality.at(mod)/Lesson::SLOT_INTERVAL;
 			switch(subject.m_semester)
 			{
@@ -212,9 +212,9 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 
 	for(const auto& tuple : shuffleVector(s_MAP))
 	{
-		Subject::SUBJECT_MODALITY mod = std::get<0>(tuple);
-		const Subject& sub = std::get<1>(tuple);
-		const Class& classes = std::get<2>(tuple);
+		Subject::SUBJECT_MODALITY mod = std::get< 0 >(tuple);
+		const Subject& sub = std::get< 1 >(tuple);
+		const Class& classes = std::get< 2 >(tuple);
 		int randWeek = random(0, WEEK_BY_SEMESTER);
 		if(sub.m_semester == Subject::S2 || sub.m_semester == Subject::S4)
 		{
@@ -223,10 +223,10 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 		int randDay = random(0, Lesson::DAY_SIZE);
 		int randSlot = random(0, Lesson::SLOT_SIZE);
 
-		(*schedules)[randWeek][static_cast<Lesson::LESSON_DAY>(randDay)][static_cast<Lesson::LESSON_SLOT>(randSlot)].emplace_back(sub, randTeacher(sub), randRoom(sub, mod), classes, mod);
+		(*schedules)[randWeek][static_cast< Lesson::LESSON_DAY >(randDay)][static_cast< Lesson::LESSON_SLOT >(randSlot)].emplace_back(sub, randTeacher(sub), randRoom(sub, mod), classes, mod);
 	}
 
-	//static const std::vector< std::tuple< Subject::SUBJECT_MODALITY, Subject, std::initializer_list<Class> > > s_MAP;
+	//static const std::vector< std::tuple< Subject::SUBJECT_MODALITY, Subject, std::initializer_list< Class > > > s_MAP;
 	/*for(unsigned short _week = 0; _week < WEEK_BY_SEMESTER*2; ++_week)
 	{
 		for(unsigned short _day = 0; _day < Lesson::DAY_SIZE; ++_day)
