@@ -41,6 +41,18 @@ public:
 
 public:
 
+	const Subject& m_subject;
+
+	const Teacher& m_teacher;
+
+	const Room& m_room;
+	
+	const Class& m_class;
+	
+	const Subject::SUBJECT_MODALITY m_modality;
+
+public:
+
 	Lesson(const Subject&, const Teacher&, const Room&, const Class&, Subject::SUBJECT_MODALITY);
 
 	Lesson(const Lesson&) = default;
@@ -64,18 +76,6 @@ public:
 		} 
 		return _o << "{ " << _l.m_subject << " " << _l.m_room << " " << _l.m_teacher << " " << _l.m_class << " }";
 	}
-
-public:
-
-	const Subject& m_subject;
-
-	const Teacher& m_teacher;
-
-	const Room& m_room;
-	
-	const Class& m_class;
-	
-	const Subject::SUBJECT_MODALITY m_modality;
 
 };
 

@@ -67,7 +67,7 @@ public:
 
 	const SUBJECT_TYPE m_type;
 
-	std::map<SUBJECT_MODALITY, unsigned short> m_modality;
+	const std::map<SUBJECT_MODALITY, unsigned short> m_modality;
 
 public:
 
@@ -169,8 +169,9 @@ Subject::Subject(const std::string& _name, SUBJECT_SEMESTER _semester, SUBJECT_S
 		m_speciality(_speciality),
 		m_type(_type)
 {
-	m_modality[CM] = _cm;
-	m_modality[CI] = _ci;
-	m_modality[TD] = _td;
-	m_modality[TP] = _tp;
+	auto& mod = const_cast< std::map<SUBJECT_MODALITY, unsigned short>& >(m_modality);
+	mod[CM] = _cm;
+	mod[CI] = _ci;
+	mod[TD] = _td;
+	mod[TP] = _tp;
 }

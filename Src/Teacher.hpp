@@ -12,10 +12,10 @@
 --------------------------------------------------------------------------------- */
 
 template <typename T, typename F, typename G>
-void variadic_map_emplace(std::map<T,std::map<F,G>>&);
+static void variadic_map_emplace(std::map<T,std::map<F,G>>&);
 
 template <typename T, typename F, typename G, typename First, typename Second, typename... Args>
-void variadic_map_emplace(std::map<T,std::map<F,G>>&, First&&, Second&&, Args&&...);
+static void variadic_map_emplace(std::map<T,std::map<F,G>>&, First&&, Second&&, Args&&...);
 
 class Teacher
 {
@@ -69,7 +69,7 @@ public:
 
 	const std::string m_name;
 
-	std::map<TEACHERS_DAY, std::map<TEACHERS_SLOT, bool>> m_availability;
+	const std::map< TEACHERS_DAY, std::map<TEACHERS_SLOT, bool> > m_availability;
 
 public:
 
@@ -156,12 +156,13 @@ Teacher::Teacher(TEACHERS_TYPE _type, TEACHERS_TIME _time, const std::string& _n
 		m_time(_time),
 		m_name(_name)
 {
+	auto& availability = const_cast< std::map<TEACHERS_DAY, std::map<TEACHERS_SLOT, bool> >& >(m_availability);
 	for(int i=0 ; i<5 ; ++i)
 	{
 		for(int j=0 ; j<4 ; ++j)
 		{
-			m_availability[(TEACHERS_DAY)i][(TEACHERS_SLOT)j] = true;
+			availability[(TEACHERS_DAY)i][(TEACHERS_SLOT)j] = true;
 		}
 	}
-	variadic_map_emplace(m_availability, std::forward<Args>(_notAvailable)...);
+	variadic_map_emplace(availability, std::forward<Args>(_notAvailable)...);
 }
