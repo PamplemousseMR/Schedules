@@ -381,7 +381,78 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
 \GenomeClass::evaluator:
-	return 1;
+	Schedules* schedules = (Schedules*)Genome.m_schedules;
+	long result = 0;
+
+	#pragma omp parallel for shared(schedules) reduction(+:result)
+	for(unsigned short _week = 0; _week < WEEK_BY_SEMESTER*2; ++_week)
+	{
+		for(unsigned short _day = 0; _day < Lesson::DAY_SIZE; ++_day)
+		{
+			Lesson::LESSON_DAY day = static_cast<Lesson::LESSON_DAY>(_day);
+			
+			for(unsigned short _slot = 0; _slot < Lesson::SLOT_SIZE; ++_slot)
+			{
+				Lesson::LESSON_SLOT slot = static_cast<Lesson::LESSON_SLOT>(_slot);
+				
+				//Tests des profs
+				for(unsigned i=0 ; i<Teacher::TYPE_SIZE ; ++i)
+				{
+					for(const Teacher& teacher : Teacher::s_teachers.at(static_cast< Teacher::TEACHERS_TYPE >(i)))
+					{
+						if(countTeacher(teacher, (*schedules)[_week][day][slot]) > 1)
+						{
+							result += 1000;
+						}
+					}
+				}
+				
+				//Tests des salles
+				for(unsigned i=0 ; i<Room::TYPE_SIZE ; ++i)
+				{
+					for(const Room& room : Room::s_rooms.at(static_cast< Room::ROOM_TYPE >(i)))
+					{
+						if(countRoom(room, (*schedules)[_week][day][slot]) > 1)
+						{
+							result += 1000;
+						}
+					}
+				}
+				
+				//Tests des classes (relou)
+				for(unsigned short _year=0 ; _year<Class::YEAR_SIZE; ++_year)
+				{
+					Class::CLASS_YEAR year = static_cast<Class::CLASS_YEAR>(_year);
+					
+					for(unsigned short _spe=0 ; _spe<Class::SPE_ALL; ++_spe)
+					{
+						Class::CLASS_SPE spe = static_cast<Class::CLASS_SPE>(_spe);
+						
+						for(unsigned short _group=0 ; _group<Class::ALL; ++_group)
+						{
+							if( countClass(std::get<2>(Class::s_classes).at(year).at(spe).at(static_cast< Class::CLASS_GROUP >(_group)), (*schedules)[_week][day][slot]) 
+							  + countClass(std::get<1>(Class::s_classes).at(year).at(spe), (*schedules)[_week][day][slot])
+							  + countClass(std::get<0>(Class::s_classes).at(year), (*schedules)[_week][day][slot]) > 1)
+							{
+								result += 1000;
+							}
+						}
+					}
+				}
+
+				
+				//Print du slot
+				/*std::cout << _week << " " << _day << " " << _slot << "\n";
+				auto vec = (*schedules)[_week][day][slot];
+				for(const Lesson& lesson : vec)
+				{
+					std::cout << lesson << std::endl; 
+				}*/
+			}
+		}
+	}
+	// std::cout << result << std::endl;
+	return result;
 \end
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------

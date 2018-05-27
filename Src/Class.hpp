@@ -20,7 +20,8 @@ public:
 	enum CLASS_YEAR
 	{
 		L0,
-		L1
+		L1,
+		YEAR_SIZE
 	};
 
 	enum CLASS_SPE
@@ -70,6 +71,7 @@ public:
 		{ 
 		    case L0: year = "L0"; break; 
 		    case L1: year = "L1"; break; 
+		    case YEAR_SIZE: year = ""; break; 
 		} 
 		   
 		std::string spe; 

@@ -149,3 +149,16 @@ int countRoom(const Room& _room, const std::vector<Lesson>& _liste)
 	}
 	return result;
 }
+
+int countClass(const Class& _class, const std::vector<Lesson>& _liste)
+{
+	int result = 0;
+	for(const Lesson& lesson : _liste)
+	{
+		if(lesson.m_class == &_class)
+		{
+			++result;
+		}
+	}
+	return result;
+}
