@@ -182,7 +182,7 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 
 \GenomeClass::initialiser:
 
-	Schedules* schedules = new Schedules();
+	Schedules& schedules = *(new Schedules());
 
 	for(const auto& tuple : shuffleVector(s_MAP))
 	{
@@ -197,27 +197,10 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 		int randDay = random(0, Lesson::DAY_SIZE);
 		int randSlot = random(0, Lesson::SLOT_SIZE);
 
-		(*schedules)[randWeek][static_cast< Lesson::LESSON_DAY >(randDay)][static_cast< Lesson::LESSON_SLOT >(randSlot)].emplace_back(sub, randTeacher(sub), randRoom(sub, mod), classes, mod);
+		schedules[randWeek][static_cast< Lesson::LESSON_DAY >(randDay)][static_cast< Lesson::LESSON_SLOT >(randSlot)].emplace_back(sub, randTeacher(sub), randRoom(sub, mod), classes, mod);
 	}
 
-	//static const std::vector< std::tuple< Subject::SUBJECT_MODALITY, Subject, std::initializer_list< Class > > > s_MAP;
-	/*for(unsigned short _week = 0; _week < WEEK_BY_SEMESTER*2; ++_week)
-	{
-		for(unsigned short _day = 0; _day < Lesson::DAY_SIZE; ++_day)
-		{
-			for(unsigned short _slot = 0; _slot < Lesson::SLOT_SIZE; ++_slot)
-			{
-				std::cout << _week << " " << _day << " " << _slot << "\n\t";
-				auto vec = (*schedules)[_week][static_cast<Lesson::LESSON_DAY>(_day)][static_cast<Lesson::LESSON_SLOT>(_slot)];
-				for(const Lesson& lesson : vec)
-				{
-					std::cout << lesson << std::endl; 
-				}
-			}
-		}
-	}*/
-
-	Genome.m_schedules = (void*)schedules;
+	Genome.m_schedules = &schedules;
 
 \end
 
@@ -225,6 +208,86 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
 \GenomeClass::crossover:
+
+	Schedules& firstParentSchedules = *(Schedules*)parent1.m_schedules;
+	Schedules& secondParentSchedules = *(Schedules*)parent2.m_schedules;
+	delete(static_cast< Schedules* >(child.m_schedules));
+
+	Schedules* newChild = new Schedules();
+
+	bool randS1 = static_cast< bool >(random(0, 2));
+	bool randS2 = static_cast< bool >(random(0, 2));
+	bool randS3 = static_cast< bool >(random(0, 2));
+	bool randS4 = static_cast< bool >(random(0, 2));
+
+	auto getFromSemester = [&](unsigned short _week, const Schedules& _src, Subject::SUBJECT_SEMESTER _semester)	
+	{	
+		for(unsigned short _day = 0; _day < Lesson::DAY_SIZE; ++_day)
+		{
+			Lesson::LESSON_DAY day = static_cast<Lesson::LESSON_DAY>(_day);
+			for(unsigned short _slot = 0; _slot < Lesson::SLOT_SIZE; ++_slot)
+			{		
+				Lesson::LESSON_SLOT slot = static_cast<Lesson::LESSON_SLOT>(_slot);
+				if(_src.find(_week) != _src.end() &&
+				 	_src.at(_week).find(day) != _src.at(_week).end() &&
+				 	_src.at(_week).at(day).find(slot) != _src.at(_week).at(day).end())
+				{
+					for(const Lesson& les: _src.at(_week).at(day).at(slot))
+					{
+						if(les.m_subject->m_semester == _semester)
+						{
+							(*newChild)[_week][day][slot].push_back(les);
+						}
+					}
+				}
+			}
+		}
+	};
+
+	for(unsigned short _week = 0; _week < WEEK_BY_SEMESTER; ++_week)
+	{
+		if(randS1)
+		{
+			getFromSemester(_week, firstParentSchedules, Subject::S1);
+		}
+		else
+		{
+			getFromSemester(_week, secondParentSchedules, Subject::S1);
+		}
+
+		if(randS3)
+		{
+			getFromSemester(_week, firstParentSchedules, Subject::S3);
+		}
+		else
+		{
+			getFromSemester(_week, secondParentSchedules, Subject::S3);
+		}
+	}
+
+	for(unsigned short _week = WEEK_BY_SEMESTER; _week < WEEK_BY_SEMESTER*2; ++_week)
+	{
+		if(randS2)
+		{
+			getFromSemester(_week, firstParentSchedules, Subject::S2);
+		}
+		else
+		{
+			getFromSemester(_week, secondParentSchedules, Subject::S2);
+		}
+
+		if(randS4)
+		{
+			getFromSemester(_week, firstParentSchedules, Subject::S4);
+		}
+		else
+		{
+			getFromSemester(_week, secondParentSchedules, Subject::S4);
+		}
+	}
+
+	child.m_schedules = static_cast< void* >(newChild);
+
 \end
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -254,7 +317,7 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 \Default run parameters :         // Please let the parameters appear in this order
 Number of generations : 300       // NB_GEN
 Time limit: 0                     // In seconds, 0 to deactivate
-Population size : 100           // POP_SIZE
+Population size : 100             // POP_SIZE
 Offspring size : 100%             // 40% 
 Mutation probability : 1          // MUT_PROB
 Crossover probability : 1         // XOVER_PROB

@@ -129,7 +129,7 @@ int countTeacher(const Teacher& _teacher, const std::vector<Lesson>& _liste)
 	int result = 0; 
 	for(const Lesson& lesson : _liste)
 	{
-		if(&lesson.m_teacher == &_teacher)
+		if(lesson.m_teacher == &_teacher)
 		{
 			++result;
 		}	
@@ -142,7 +142,7 @@ int countRoom(const Room& _room, const std::vector<Lesson>& _liste)
 	int result = 0; 
 	for(const Lesson& lesson : _liste)
 	{
-		if(&lesson.m_room == &_room)
+		if(lesson.m_room == &_room)
 		{
 			++result;
 		}	

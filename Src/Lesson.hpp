@@ -42,13 +42,13 @@ public:
 
 public:
 
-	const Subject& m_subject;
+	const Subject* m_subject;
 
-	const Teacher& m_teacher;
+	const Teacher* m_teacher;
 
-	const Room& m_room;
+	const Room* m_room;
 	
-	const Class& m_class;
+	const Class* m_class;
 	
 	const Subject::SUBJECT_MODALITY m_modality;
 
@@ -58,7 +58,7 @@ public:
 
 	Lesson(const Lesson&) = default;
 
-	Lesson& operator =(const Lesson&) = default;
+	Lesson& operator =(const Lesson&);
 
 	Lesson(Lesson&&) = default;
 
@@ -75,7 +75,7 @@ public:
 			case Subject::TP: mod = "TP"; break; 
 			case Subject::MODALITY_SIZE: mod = ""; break; 
 		} 
-		return _o << "{ " << "[" << mod << "] " << _l.m_subject << " " << _l.m_room << " " << _l.m_teacher << " " << _l.m_class << " }";
+		return _o << "{ " << "[" << mod << "] " << *(_l.m_subject) << " " << *(_l.m_room) << " " << *(_l.m_teacher) << " " << *(_l.m_class) << " }";
 	}
 
 };
@@ -88,10 +88,21 @@ const float Lesson::SLOT_INTERVAL = 1.5f;
 
 Lesson::Lesson(const Subject& _subject, const Teacher& _teacher, const Room& _room,
 								const Class& _classList, Subject::SUBJECT_MODALITY _modality)
-	: 	m_subject(_subject),
-		m_teacher(_teacher),
-		m_room(_room),
-		m_class(_classList),
+	: 	m_subject(&_subject),
+		m_teacher(&_teacher),
+		m_room(&_room),
+		m_class(&_classList),
 		m_modality(_modality)
 {
+}
+
+Lesson& Lesson::operator =(const Lesson& _lesson)
+{
+	m_subject = _lesson.m_subject;
+	m_teacher = _lesson.m_teacher;
+	m_room = _lesson.m_room;
+	m_class = _lesson.m_class;
+	auto& modality = const_cast< Subject::SUBJECT_MODALITY& >(m_modality);
+	modality = _lesson.m_modality;
+	return *this;
 }
