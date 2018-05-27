@@ -55,114 +55,83 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 		{
 			Subject::SUBJECT_MODALITY mod = static_cast< Subject::SUBJECT_MODALITY >(modality);
 			float number = subject.m_modality.at(mod)/Lesson::SLOT_INTERVAL;
+			Class::CLASS_YEAR _class;
 			switch(subject.m_semester)
 			{
 				case Subject::S1 :
 				case Subject::S2 :
-					switch(mod)
-					{
-						case Subject::CM : 
-						case Subject::CI : 
-          					for(float j = 0.f; j < number; j++) 
-	        				{ 
-	            				list.emplace_back(mod, subject, std::get<0>(Class::s_classes).at(Class::L0));
-	        				}  
-						break;
-						case Subject::TD : 
-							for(unsigned spe = 0; spe < std::get<1>(Class::s_classes).at(Class::L0).size() ; ++spe)
-							{
-								for(float j = 0.f; j < number; j++) 
-		        				{ 
-		            				list.emplace_back(mod, subject, std::get<1>(Class::s_classes).at(Class::L0).at(static_cast< Class::CLASS_SPE >(spe))); 
-		        				}  
-		        			}
-						break;
-						case Subject::TP : 
-							for(unsigned spe = 0; spe < std::get<1>(Class::s_classes).at(Class::L0).size() ; ++spe)
-							{
-								for(unsigned gr = 0; gr < std::get<2>(Class::s_classes).at(Class::L0).at(static_cast< Class::CLASS_SPE >(spe)).size(); ++gr)
-								{
-									for(float j = 0.f; j < number; j++) 
-			        				{ 
-			            				list.emplace_back(mod, subject, std::get<2>(Class::s_classes).at(Class::L0).at(static_cast< Class::CLASS_SPE >(spe)).at(static_cast< Class::CLASS_GROUP >(gr))); 
-			        				}  
-			        			} 
-		        			}
-						break;
-						case Subject::MODALITY_SIZE :
-						break;
-					}
-					break;
+					_class = Class::L0;
 				case Subject::S3 :
 				case Subject::S4 :
-					switch(mod)
+					_class = Class::L1;
+				break;
+			}
+			switch(mod)
+			{
+				case Subject::CM : 
+				case Subject::CI :
+					if(subject.m_speciality == Subject::COMMUN) 
 					{
-						case Subject::CM : 
-						case Subject::CI :
-							if(subject.m_speciality == Subject::COMMUN) 
-							{
-								for(float j = 0.f; j < number; j++) 
-		        				{ 
-		            				list.emplace_back(mod, subject, std::get<0>(Class::s_classes).at(Class::L1));
-		        				}   
-							}
-	        				else
-	        				{
-								for(float j = 0.f; j < number; j++) 
-		        				{ 
-		            				list.emplace_back(mod, subject, std::get<1>(Class::s_classes).at(Class::L1).at(static_cast< Class::CLASS_SPE >(subject.m_speciality))); 
-		        				} 
-							}
-						break;
-						case Subject::TD : 
-							if(subject.m_speciality == Subject::COMMUN) 
-							{
-								for(unsigned spe = 0; spe < std::get<1>(Class::s_classes).at(Class::L1).size() ; ++spe)
-								{
-									for(float j = 0.f; j < number; j++) 
-			        				{ 
-			            				list.emplace_back(mod, subject, std::get<1>(Class::s_classes).at(Class::L1).at(static_cast< Class::CLASS_SPE >(spe))); 
-			        				}  
-			        			}
-		        			}
-		        			else
-		        			{
-								for(float j = 0.f; j < number; j++) 
-		        				{ 
-		            				list.emplace_back(mod, subject, std::get<1>(Class::s_classes).at(Class::L1).at(static_cast< Class::CLASS_SPE >(subject.m_speciality))); 
-		        				}  
-	        				}
-						break;
-						case Subject::TP : 
-							if(subject.m_speciality == Subject::COMMUN) 
-							{
-								for(unsigned spe = 0; spe < std::get<1>(Class::s_classes).at(Class::L1).size() ; ++spe)
-								{
-									for(unsigned gr = 0; gr < std::get<2>(Class::s_classes).at(Class::L1).at(static_cast< Class::CLASS_SPE >(spe)).size(); ++gr)
-									{
-										for(float j = 0.f; j < number; j++) 
-				        				{ 
-				            				list.emplace_back(mod, subject, std::get<2>(Class::s_classes).at(Class::L1).at(static_cast< Class::CLASS_SPE >(spe)).at(static_cast< Class::CLASS_GROUP >(gr))); 
-				        				}  
-				        			} 
-			        			}
-		        			}
-		        			else
-		        			{
-								for(unsigned gr = 0; gr < std::get<2>(Class::s_classes).at(Class::L1).at(static_cast< Class::CLASS_SPE >(subject.m_speciality)).size(); ++gr)
-								{
-									for(float j = 0.f; j < number; j++) 
-			        				{ 
-			            				list.emplace_back(mod, subject, std::get<2>(Class::s_classes).at(Class::L1).at(static_cast< Class::CLASS_SPE >(subject.m_speciality)).at(static_cast< Class::CLASS_GROUP >(gr))); 
-			        				}  
-			        			}   
-		        			}	
-						break;
-						case Subject::MODALITY_SIZE :
-						break;
+						for(float j = 0.f; j < number; j++) 
+						{ 
+							list.emplace_back(mod, subject, std::get<0>(Class::s_classes).at(_class));
+						}   
+					}
+					else
+					{
+						for(float j = 0.f; j < number; j++) 
+						{ 
+							list.emplace_back(mod, subject, std::get<1>(Class::s_classes).at(_class).at(static_cast< Class::CLASS_SPE >(subject.m_speciality))); 
+						} 
 					}
 				break;
-			} 
+				case Subject::TD : 
+					if(subject.m_speciality == Subject::COMMUN) 
+					{
+						for(unsigned spe = 0; spe < std::get<1>(Class::s_classes).at(_class).size() ; ++spe)
+						{
+							for(float j = 0.f; j < number; j++) 
+							{ 
+								list.emplace_back(mod, subject, std::get<1>(Class::s_classes).at(_class).at(static_cast< Class::CLASS_SPE >(spe))); 
+							}  
+						}
+					}
+					else
+					{
+						for(float j = 0.f; j < number; j++) 
+						{ 
+							list.emplace_back(mod, subject, std::get<1>(Class::s_classes).at(_class).at(static_cast< Class::CLASS_SPE >(subject.m_speciality))); 
+						}  
+					}
+				break;
+				case Subject::TP : 
+					if(subject.m_speciality == Subject::COMMUN) 
+					{
+						for(unsigned spe = 0; spe < std::get<1>(Class::s_classes).at(_class).size() ; ++spe)
+						{
+							for(unsigned gr = 0; gr < std::get<2>(Class::s_classes).at(_class).at(static_cast< Class::CLASS_SPE >(spe)).size(); ++gr)
+							{
+								for(float j = 0.f; j < number; j++) 
+								{ 
+									list.emplace_back(mod, subject, std::get<2>(Class::s_classes).at(_class).at(static_cast< Class::CLASS_SPE >(spe)).at(static_cast< Class::CLASS_GROUP >(gr))); 
+								}  
+							} 
+						}
+					}
+					else
+					{
+						for(unsigned gr = 0; gr < std::get<2>(Class::s_classes).at(_class).at(static_cast< Class::CLASS_SPE >(subject.m_speciality)).size(); ++gr)
+						{
+							for(float j = 0.f; j < number; j++) 
+							{ 
+								list.emplace_back(mod, subject, std::get<2>(Class::s_classes).at(_class).at(static_cast< Class::CLASS_SPE >(subject.m_speciality)).at(static_cast< Class::CLASS_GROUP >(gr))); 
+							}  
+						}   
+					}	
+				break;
+				case Subject::MODALITY_SIZE :
+				break;
+			}
 		}
 	} 
 	list = shuffleVector(list);
@@ -285,7 +254,7 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 \Default run parameters :         // Please let the parameters appear in this order
 Number of generations : 300       // NB_GEN
 Time limit: 0                     // In seconds, 0 to deactivate
-Population size : 65536           // POP_SIZE
+Population size : 100           // POP_SIZE
 Offspring size : 100%             // 40% 
 Mutation probability : 1          // MUT_PROB
 Crossover probability : 1         // XOVER_PROB
