@@ -45,6 +45,8 @@ public:
 public:
 
 	static const ContainerType s_classes;
+	
+	static const short s_totalGroupes;
 
 public:
 
@@ -188,6 +190,8 @@ const Class::ContainerType Class::s_classes
 		}
 	}
 };
+
+const short Class::s_totalGroupes = 16;
 
 Class::Class(CLASS_YEAR _year, CLASS_SPE _spe, CLASS_GROUP _group)
 	:	m_year(_year),

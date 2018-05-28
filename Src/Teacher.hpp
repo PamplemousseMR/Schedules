@@ -61,6 +61,12 @@ public:
 public:
 
 	static const std::map< const TEACHERS_TYPE, const std::vector< Teacher > > s_teachers;
+	
+	static const short s_totalTeachers;
+	
+	static const float s_nbHoursFull;
+	
+	static const float s_nbHoursHalf;
 
 public:
 
@@ -171,6 +177,12 @@ const std::map< const Teacher::TEACHERS_TYPE, const std::vector< Teacher > > Tea
 	    }
     }
 };
+
+const short Teacher::s_totalTeachers = 24; 
+ 
+const float Teacher::s_nbHoursFull = 384.f; 
+
+const float Teacher::s_nbHoursHalf = 192.f; 
 
 template < typename... Args >
 Teacher::Teacher(TEACHERS_TYPE _type, TEACHERS_TIME _time, const std::string& _name, Args&&... _notAvailable)
