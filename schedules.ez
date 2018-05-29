@@ -24,7 +24,8 @@ typedef std::map< int, Week > Schedules;
 
 static const std::vector< std::tuple< Subject::SUBJECT_MODALITY, const Subject&, const Class& > > s_MAP;
 
-static const unsigned short s_STRONG_CONSTRAINT = 2;
+static const unsigned short s_STRONG_CONSTRAINT = 1000;
+static const unsigned short s_MIDDLE_CONSTRAINT = 500;
 static const unsigned short s_WEAK_CONSTRAINT = 1;
 
 \end
@@ -381,7 +382,173 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
 \GenomeClass::evaluator:
-	return 1;
+	Schedules* schedules = (Schedules*)Genome.m_schedules;
+	long result = 0;
+	std::map< unsigned, float > nbTotalTeacher;
+	
+	#pragma omp parallel for shared(schedules) reduction(+:result)
+	for(unsigned short _week = 0; _week < WEEK_BY_SEMESTER*2; ++_week)
+	{
+		for(unsigned short _day = 0; _day < Lesson::DAY_SIZE; ++_day)
+		{
+			Lesson::LESSON_DAY day = static_cast<Lesson::LESSON_DAY>(_day);
+			Teacher::TEACHERS_DAY tday = static_cast<Teacher::TEACHERS_DAY>(_day);
+			std::map< unsigned, std::map< unsigned, unsigned > > nbCoursTeacher;
+			std::map< unsigned, std::map< unsigned, unsigned > >  nbCoursClass;
+			
+			for(unsigned short _slot = 0; _slot < Lesson::SLOT_SIZE; ++_slot)
+			{
+				Lesson::LESSON_SLOT slot = static_cast<Lesson::LESSON_SLOT>(_slot);
+				Teacher::TEACHERS_SLOT tslot = static_cast<Teacher::TEACHERS_SLOT>(_slot);
+				int idx;
+				
+				//Tests des profs
+				idx = 0;
+				for(unsigned i=0 ; i<Teacher::TYPE_SIZE ; ++i)
+				{
+					for(const Teacher& teacher : Teacher::s_teachers.at(static_cast< Teacher::TEACHERS_TYPE >(i)))
+					{
+						++idx;
+						int count = countTeacher(teacher, (*schedules)[_week][day][slot]);
+						if( count > 0)
+						{
+							nbCoursTeacher[idx][_slot]++;
+							nbTotalTeacher[idx] += Lesson::SLOT_INTERVAL;
+							if( count > 1)
+							{
+								result += s_STRONG_CONSTRAINT;
+							}
+							if(!teacher.m_availability.at(tday).at(tslot))
+							{
+								result += s_MIDDLE_CONSTRAINT;
+							}
+						}
+					}
+				}
+				
+				//Tests des salles
+				for(unsigned i=0 ; i<Room::TYPE_SIZE ; ++i)
+				{
+					for(const Room& room : Room::s_rooms.at(static_cast< Room::ROOM_TYPE >(i)))
+					{
+						if(countRoom(room, (*schedules)[_week][day][slot]) > 1)
+						{
+							result += s_STRONG_CONSTRAINT;
+						}
+					}
+				}
+				
+				//Tests des classes (relou)
+				idx = 0 ;
+				for(unsigned short _year=0 ; _year<Class::YEAR_SIZE; ++_year)
+				{
+					Class::CLASS_YEAR year = static_cast<Class::CLASS_YEAR>(_year);
+					
+					for(unsigned short _spe=0 ; _spe<Class::SPE_ALL; ++_spe)
+					{
+						Class::CLASS_SPE spe = static_cast<Class::CLASS_SPE>(_spe);
+						
+						for(unsigned short _group=0 ; _group<Class::ALL; ++_group)
+						{
+							idx++;
+							int count = countClass(std::get<2>(Class::s_classes).at(year).at(spe).at(static_cast< Class::CLASS_GROUP >(_group)), (*schedules)[_week][day][slot]) 
+									  + countClass(std::get<1>(Class::s_classes).at(year).at(spe), (*schedules)[_week][day][slot])
+									  + countClass(std::get<0>(Class::s_classes).at(year), (*schedules)[_week][day][slot]);
+							if( count > 0)
+							{
+								nbCoursClass[idx][_slot]++;
+								if( count > 1)
+								{
+									result += s_STRONG_CONSTRAINT;
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			for(unsigned i=0 ; i<Teacher::s_totalTeachers ; ++i)
+			{
+				int count = nbCoursTeacher[i][Lesson::SLOT_0] + nbCoursTeacher[i][Lesson::SLOT_1] + nbCoursTeacher[i][Lesson::SLOT_2] + nbCoursTeacher[i][Lesson::SLOT_3];
+				if (count){
+					switch(count)
+					{
+						case 1 :
+							result += s_WEAK_CONSTRAINT;
+						break;
+						case 2 :
+							if( (nbCoursTeacher[i][Lesson::SLOT_0] && nbCoursTeacher[i][Lesson::SLOT_2])
+							  ||(nbCoursTeacher[i][Lesson::SLOT_0] && nbCoursTeacher[i][Lesson::SLOT_3])
+							  ||(nbCoursTeacher[i][Lesson::SLOT_1] && nbCoursTeacher[i][Lesson::SLOT_3]) )
+							{
+								result += s_WEAK_CONSTRAINT;
+							}
+						break;
+						case 3 :
+							if(!nbCoursTeacher[i][Lesson::SLOT_1] || !nbCoursTeacher[i][Lesson::SLOT_2])
+							{
+								result += s_WEAK_CONSTRAINT;
+							}
+						break;
+						case 4 :
+							result += s_WEAK_CONSTRAINT;
+						break;
+					}
+				}
+			}
+			
+			for(unsigned i=0 ; i<Class::s_totalGroupes ; ++i)
+			{
+				int count = nbCoursClass[i][Lesson::SLOT_0] + nbCoursClass[i][Lesson::SLOT_1] + nbCoursClass[i][Lesson::SLOT_2] + nbCoursClass[i][Lesson::SLOT_3];
+				if (count > 0){
+					switch(count)
+					{
+						case 1 :
+							result += s_WEAK_CONSTRAINT;
+						break;
+						case 2 :
+							if( (nbCoursClass[i][Lesson::SLOT_0] && nbCoursClass[i][Lesson::SLOT_2])
+							  ||(nbCoursClass[i][Lesson::SLOT_0] && nbCoursClass[i][Lesson::SLOT_3])
+							  ||(nbCoursClass[i][Lesson::SLOT_1] && nbCoursClass[i][Lesson::SLOT_3]) )
+							{
+								result += s_WEAK_CONSTRAINT;
+							}
+						break;
+						case 3 :
+							if(!nbCoursClass[i][Lesson::SLOT_1] || !nbCoursClass[i][Lesson::SLOT_2])
+							{
+								result += s_WEAK_CONSTRAINT;
+							}
+						break;
+						case 4 :
+							result += s_WEAK_CONSTRAINT;
+						break;
+					}
+				}
+			}
+		}
+	}
+	unsigned idx = 0;
+	for(unsigned i=0 ; i<Teacher::TYPE_SIZE ; ++i)
+	{
+		for(const Teacher& teacher : Teacher::s_teachers.at(static_cast< Teacher::TEACHERS_TYPE >(i)))
+		{
+			++idx;
+			switch(teacher.m_time)
+			{
+				case Teacher::FULL :
+					result += std::abs(Teacher::s_nbHoursFull-nbTotalTeacher[idx])*s_STRONG_CONSTRAINT;
+				break;
+				case Teacher::HALF :
+					result += std::abs(Teacher::s_nbHoursHalf-nbTotalTeacher[idx])*s_STRONG_CONSTRAINT;
+				break;
+				case Teacher::HOUR :
+					result += nbTotalTeacher[idx]*s_MIDDLE_CONSTRAINT;
+				break;
+			}
+		}
+	}
+	return result;
 \end
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -397,7 +564,7 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 \Default run parameters :         // Please let the parameters appear in this order
 Number of generations : 300       // NB_GEN
 Time limit: 0                     // In seconds, 0 to deactivate
-Population size : 100             // POP_SIZE
+Population size : 1000           // POP_SIZE
 Offspring size : 100%             // 40% 
 Mutation probability : 1          // MUT_PROB
 Crossover probability : 1         // XOVER_PROB
