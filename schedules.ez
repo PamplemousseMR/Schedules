@@ -465,6 +465,69 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 						}
 					}
 				}
+				
+				for(const Lesson& lesson : (*schedules)[_week][day][slot])
+				{
+					switch(lesson.m_modality) 
+					{
+						case Subject::TP :
+							switch(lesson.m_subject->m_type)
+							{
+								case Subject::COMPUTER_SCIENCE :
+									if(lesson.m_room->m_type != Room::COMPUTER)
+									{
+											result += s_STRONG_CONSTRAINT;
+									}
+								break;
+								case Subject::PHYSICS :
+								case Subject::CHEMISTRY :
+									if(lesson.m_room->m_type != Room::LABORATORY)
+									{
+											result += s_STRONG_CONSTRAINT;
+									}
+								break;
+								case Subject::ENGLISH :
+								case Subject::FRENCH :
+									if(lesson.m_room->m_type != Room::LANGUAGE)
+									{
+											result += s_STRONG_CONSTRAINT;
+									}
+								break;
+								default :
+								break;
+							}
+						break;
+						case Subject::TD :
+							if(lesson.m_room->m_type != Room::ROOM)
+							{
+								result += s_STRONG_CONSTRAINT;
+							}
+						break;
+						case Subject::CI :
+						case Subject::CM :
+							if(lesson.m_subject->m_speciality == Subject::COMMUN)
+							{
+								if(lesson.m_room->m_type != Room::AMPHI)
+								{
+									result += s_STRONG_CONSTRAINT;
+								}
+							}
+							else
+							{
+								if(lesson.m_room->m_type != Room::ROOM)
+								{
+									result += s_STRONG_CONSTRAINT;
+								}
+							}
+						break;
+						default :
+						break;
+					}
+					if(lesson.m_subject->m_type != Subject::UNDEFINED && lesson.m_subject->m_type != static_cast<Subject::SUBJECT_TYPE>(lesson.m_teacher->m_type) )
+					{
+						result += s_STRONG_CONSTRAINT;
+					}
+				}
 			}
 			
 			for(unsigned i=0 ; i<Teacher::s_totalTeachers ; ++i)
