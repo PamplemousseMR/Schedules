@@ -534,7 +534,7 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 						default :
 						break;
 					}
-					if(lesson.m_subject->m_type != Subject::UNDEFINED && lesson.m_subject->m_type != static_cast<Subject::SUBJECT_TYPE>(lesson.m_teacher->m_type) )
+					if(lesson.m_subject->m_type != Subject::UNDEFINED && lesson.m_teacher->m_time != Teacher::TEMPORARY && lesson.m_subject->m_type != static_cast<Subject::SUBJECT_TYPE>(lesson.m_teacher->m_type) )
 					{
 						result += s_STRONG_CONSTRAINT;
 					}
@@ -619,6 +619,9 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 				case Teacher::HOUR :
 					result += nbTotalTeacher[idx]*s_MIDDLE_CONSTRAINT;
 				break;
+				case Teacher::TEMPORARY :
+					result += std::abs(Teacher::s_nbHoursTemporary-nbTotalTeacher[idx])*s_STRONG_CONSTRAINT;
+				break;
 			}
 		}
 	}
@@ -638,7 +641,7 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 \Default run parameters :         // Please let the parameters appear in this order
 Number of generations : 30000     // NB_GEN
 Time limit: 0                     // In seconds, 0 to deactivate
-Population size : 100            // POP_SIZE
+Population size : 100             // POP_SIZE
 Offspring size : 100%             // 40% 
 Mutation probability : 0.4        // MUT_PROB
 Crossover probability : 1         // XOVER_PROB

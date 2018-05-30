@@ -30,6 +30,7 @@ public:
 		CHEMISTRY,
 		ENGLISH,
 		FRENCH,
+		UNDEFINED,
 		TYPE_SIZE
 	};
 
@@ -37,7 +38,8 @@ public:
 	{
 		FULL,
 		HALF,
-		HOUR
+		HOUR,
+		TEMPORARY
 	};
 
 	enum TEACHERS_DAY
@@ -67,6 +69,8 @@ public:
 	static const float s_nbHoursFull;
 	
 	static const float s_nbHoursHalf;
+	
+	static const float s_nbHoursTemporary;
 
 public:
 
@@ -99,6 +103,7 @@ public:
 			case CHEMISTRY: type = "CHEMISTRY_"; break; 
 			case ENGLISH: type = "ENGLISH_"; break; 
 			case FRENCH: type = "FRENCH_"; break; 
+			case UNDEFINED: type = "UNDEFINED_"; break; 
 			case TYPE_SIZE: type = ""; break;
 		} 
 		return _o << "Teacher_" << type << _t.m_name;
@@ -175,7 +180,23 @@ const std::map< const Teacher::TEACHERS_TYPE, const std::vector< Teacher > > Tea
 		    Teacher(FRENCH, HALF, "D"), 
 		    Teacher(FRENCH, HOUR, "E")
 	    }
+    },
+    { UNDEFINED,
+		{	
+			Teacher(FRENCH, TEMPORARY, "A"), 
+			Teacher(FRENCH, TEMPORARY, "B"), 
+			Teacher(FRENCH, TEMPORARY, "C"), 
+			Teacher(FRENCH, TEMPORARY, "D"), 
+			Teacher(FRENCH, TEMPORARY, "E"), 
+			Teacher(FRENCH, TEMPORARY, "F"), 
+			Teacher(FRENCH, TEMPORARY, "G"), 
+			Teacher(FRENCH, TEMPORARY, "H"), 
+			Teacher(FRENCH, TEMPORARY, "I"), 
+			Teacher(FRENCH, TEMPORARY, "J"), 
+			Teacher(FRENCH, TEMPORARY, "K")
+	    }
     }
+
 };
 
 const short Teacher::s_totalTeachers = 24; 
@@ -183,6 +204,8 @@ const short Teacher::s_totalTeachers = 24;
 const float Teacher::s_nbHoursFull = 384.f; 
 
 const float Teacher::s_nbHoursHalf = 192.f; 
+
+const float Teacher::s_nbHoursTemporary = 20.f; 
 
 template < typename... Args >
 Teacher::Teacher(TEACHERS_TYPE _type, TEACHERS_TIME _time, const std::string& _name, Args&&... _notAvailable)
