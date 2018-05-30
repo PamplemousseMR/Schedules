@@ -14,7 +14,7 @@
 										Schedules
 --------------------------------------------------------------------------------- */
 
-static const unsigned short WEEK_BY_SEMESTER = 14;
+static const unsigned short WEEK_BY_SEMESTER = 18;
 static const unsigned short MAX_HOUR_PER_WEEK = 30;
 static const unsigned short MAX_HOUR_PER_DAY = 6; 
 
@@ -198,7 +198,7 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 		const Lesson::LESSON_DAY randDay = static_cast< Lesson::LESSON_DAY >(random(0, Lesson::DAY_SIZE)); 
 		const Lesson::LESSON_SLOT randSlot = static_cast< Lesson::LESSON_SLOT >(random(0, Lesson::SLOT_SIZE)); 
 
-		schedules[randWeek][randDay][randSlot].emplace_back(sub, randTeacher(sub), randRoom(sub, mod), classes, mod);
+		schedules[randWeek][randDay][randSlot].emplace_back(sub, randTeacher(), randRoom(), classes, mod);
 	}
 
 	Genome.m_schedules = &schedules;
@@ -326,18 +326,34 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 	const auto mutateTeacher = [&](unsigned short _week, Lesson::LESSON_DAY _day, Lesson::LESSON_SLOT _slot)	
 	{	
 		std::vector< Lesson >& lessons = schedules.at(_week).at(_day).at(_slot); 
-		Lesson& lesson = lessons[random(0, lessons.size())];
-		const Teacher& newTeacher = randTeacher(*lesson.m_subject);
-	    lesson.m_teacher = &newTeacher;
+		const Teacher& newTeacher = randTeacher();
+	    lessons[random(0, lessons.size())].m_teacher = &newTeacher;
 	};
 
 	const auto mutateRoom = [&](unsigned short _week, Lesson::LESSON_DAY _day, Lesson::LESSON_SLOT _slot)	
 	{	
 		std::vector< Lesson >& lessons = schedules.at(_week).at(_day).at(_slot); 
-		Lesson& lesson = lessons[random(0, lessons.size())];
-		const Room& newRoom = randRoom(*lesson.m_subject, lesson.m_modality);
-	    lesson.m_room = &newRoom;
+		const Room& newRoom = randRoom();
+	    lessons[random(0, lessons.size())].m_room = &newRoom;
 	};
+
+	std::vector< std::tuple< bool, bool ,bool > > randMutate(WEEK_BY_SEMESTER*2*Lesson::DAY_SIZE*Lesson::SLOT_SIZE, std::make_tuple(false, false, false));
+
+	for(int i=0 ; i<WEEK_BY_SEMESTER*2*Lesson::DAY_SIZE*Lesson::SLOT_SIZE ; ++i)
+	{
+		if(tossCoin(1.f/3.f))
+		{
+			std::get< 0 >(randMutate[i]) = true;
+		}
+		if(tossCoin(1.f/3.f))
+		{
+			std::get< 1 >(randMutate[i]) = true;
+		}
+		if(tossCoin(1.f/3.f))
+		{
+			std::get< 2 >(randMutate[i]) = true;
+		}
+	}
 
 	for(unsigned short week = 0; week < WEEK_BY_SEMESTER*2; ++week) 
   	{ 
@@ -351,23 +367,18 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 				 	schedules.at(week).find(day) != schedules.at(week).end() &&
 				 	schedules.at(week).at(day).find(slot) != schedules.at(week).at(day).end())
 				{
-					if(tossCoin(schedules.at(week).at(day).at(slot).size()/s_MAP.size()))
+					//std::cout << week*Lesson::DAY_SIZE*Lesson::SLOT_SIZE+_day*Lesson::SLOT_SIZE+_slot << std::endl;
+					if(std::get< 0 >(randMutate[week*Lesson::DAY_SIZE*Lesson::SLOT_SIZE+_day*Lesson::SLOT_SIZE+_slot]))
 					{
-						const short rand = random(0,3);
-						switch(rand)
-						{
-							case 0 :
-								mutateLesson(week, day, slot);
-							break;
-							case 1 :
-								mutateTeacher(week, day, slot);
-							break;
-							case 2 :
-								mutateRoom(week, day, slot);
-							break;
-							default :
-							break;
-						}
+						mutateTeacher(week, day, slot);
+					}
+					if(std::get< 1 >(randMutate[week*Lesson::DAY_SIZE*Lesson::SLOT_SIZE+_day*Lesson::SLOT_SIZE+_slot]))
+					{
+						mutateRoom(week, day, slot);
+					}
+					if(std::get< 2 >(randMutate[week*Lesson::DAY_SIZE*Lesson::SLOT_SIZE+_day*Lesson::SLOT_SIZE+_slot]))
+					{
+						mutateLesson(week, day, slot);
 					}
 				}
 			} 
@@ -625,15 +636,15 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
 \Default run parameters :         // Please let the parameters appear in this order
-Number of generations : 300       // NB_GEN
+Number of generations : 30000     // NB_GEN
 Time limit: 0                     // In seconds, 0 to deactivate
-Population size : 1000           // POP_SIZE
+Population size : 100            // POP_SIZE
 Offspring size : 100%             // 40% 
-Mutation probability : 1          // MUT_PROB
+Mutation probability : 0.4        // MUT_PROB
 Crossover probability : 1         // XOVER_PROB
 Evaluator goal : minimise         // Maximise
 Selection operator: Tournament 2 
-Surviving parents: 100%           // percentage or absolute
+Surviving parents: 50%           // percentage or absolute
 Surviving offspring: 100%
 Reduce parents operator: Tournament 2
 Reduce offspring operator: Tournament 2
