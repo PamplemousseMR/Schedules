@@ -86,6 +86,7 @@ Compilation
 -
 
 	- Générer le projet avec easea schedules.ez
+	- Lancer hack.sh
 	- Compiler à l'aide du makefile
 
 Utilisation

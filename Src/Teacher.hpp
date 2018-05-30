@@ -183,17 +183,17 @@ const std::map< const Teacher::TEACHERS_TYPE, const std::vector< Teacher > > Tea
     },
     { UNDEFINED,
 		{	
-			Teacher(FRENCH, TEMPORARY, "A"), 
-			Teacher(FRENCH, TEMPORARY, "B"), 
-			Teacher(FRENCH, TEMPORARY, "C"), 
-			Teacher(FRENCH, TEMPORARY, "D"), 
-			Teacher(FRENCH, TEMPORARY, "E"), 
-			Teacher(FRENCH, TEMPORARY, "F"), 
-			Teacher(FRENCH, TEMPORARY, "G"), 
-			Teacher(FRENCH, TEMPORARY, "H"), 
-			Teacher(FRENCH, TEMPORARY, "I"), 
-			Teacher(FRENCH, TEMPORARY, "J"), 
-			Teacher(FRENCH, TEMPORARY, "K")
+			Teacher(UNDEFINED, TEMPORARY, "A"), 
+			Teacher(UNDEFINED, TEMPORARY, "B"), 
+			Teacher(UNDEFINED, TEMPORARY, "C"), 
+			Teacher(UNDEFINED, TEMPORARY, "D"), 
+			Teacher(UNDEFINED, TEMPORARY, "E"), 
+			Teacher(UNDEFINED, TEMPORARY, "F"), 
+			Teacher(UNDEFINED, TEMPORARY, "G"), 
+			Teacher(UNDEFINED, TEMPORARY, "H"), 
+			Teacher(UNDEFINED, TEMPORARY, "I"), 
+			Teacher(UNDEFINED, TEMPORARY, "J"), 
+			Teacher(UNDEFINED, TEMPORARY, "K")
 	    }
     }
 

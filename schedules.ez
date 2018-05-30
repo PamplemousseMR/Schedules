@@ -15,8 +15,6 @@
 --------------------------------------------------------------------------------- */
 
 static const unsigned short WEEK_BY_SEMESTER = 18;
-static const unsigned short MAX_HOUR_PER_WEEK = 30;
-static const unsigned short MAX_HOUR_PER_DAY = 6; 
 
 typedef std::map< Lesson::LESSON_SLOT, std::vector< Lesson > > Day;
 typedef std::map< Lesson::LESSON_DAY, Day > Week;
@@ -143,6 +141,7 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
 \After everything else function:
+	bBest->printOn(std::cout);
 \end
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -176,6 +175,26 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
 \GenomeClass::display:
+
+  	Schedules& schedules = (*(Schedules*)Genome.m_schedules); 
+
+	for(unsigned short _week = 0; _week < WEEK_BY_SEMESTER*2 ; ++_week)
+	{
+		for(unsigned short _day = 0; _day < Lesson::DAY_SIZE; ++_day)
+		{
+			const Lesson::LESSON_DAY day = static_cast<Lesson::LESSON_DAY>(_day);
+			for(unsigned short _slot = 0; _slot < Lesson::SLOT_SIZE; ++_slot)
+			{		
+				std::cout << "Week : " << _week << " Day : "<< _day << " Slot : " << _slot << std::endl;
+				const Lesson::LESSON_SLOT slot = static_cast<Lesson::LESSON_SLOT>(_slot);
+				for(const Lesson& les: schedules[_week][day][slot])
+				{
+					std::cout << les << std::endl;
+				}
+			}
+		}
+	}
+
 \end
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -311,9 +330,10 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 		switch(lesson.m_subject->m_semester)
 		{
 			case Subject::S1 :
-			case Subject::S2 :
-				randWeek = random(0, WEEK_BY_SEMESTER);
 			case Subject::S3 :
+				randWeek = random(0, WEEK_BY_SEMESTER);
+			break;
+			case Subject::S2 :
 			case Subject::S4 :
 				randWeek = random(WEEK_BY_SEMESTER, WEEK_BY_SEMESTER*2);
 			break;
@@ -337,24 +357,6 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 	    lessons[random(0, lessons.size())].m_room = &newRoom;
 	};
 
-	std::vector< std::tuple< bool, bool ,bool > > randMutate(WEEK_BY_SEMESTER*2*Lesson::DAY_SIZE*Lesson::SLOT_SIZE, std::make_tuple(false, false, false));
-
-	for(int i=0 ; i<WEEK_BY_SEMESTER*2*Lesson::DAY_SIZE*Lesson::SLOT_SIZE ; ++i)
-	{
-		if(tossCoin(1.f/3.f))
-		{
-			std::get< 0 >(randMutate[i]) = true;
-		}
-		if(tossCoin(1.f/3.f))
-		{
-			std::get< 1 >(randMutate[i]) = true;
-		}
-		if(tossCoin(1.f/3.f))
-		{
-			std::get< 2 >(randMutate[i]) = true;
-		}
-	}
-
 	for(unsigned short week = 0; week < WEEK_BY_SEMESTER*2; ++week) 
   	{ 
 		for(unsigned short _day = 0; _day < Lesson::DAY_SIZE; ++_day) 
@@ -367,16 +369,15 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 				 	schedules.at(week).find(day) != schedules.at(week).end() &&
 				 	schedules.at(week).at(day).find(slot) != schedules.at(week).at(day).end())
 				{
-					//std::cout << week*Lesson::DAY_SIZE*Lesson::SLOT_SIZE+_day*Lesson::SLOT_SIZE+_slot << std::endl;
-					if(std::get< 0 >(randMutate[week*Lesson::DAY_SIZE*Lesson::SLOT_SIZE+_day*Lesson::SLOT_SIZE+_slot]))
+					if(tossCoin(1.f/3.f))
 					{
 						mutateTeacher(week, day, slot);
 					}
-					if(std::get< 1 >(randMutate[week*Lesson::DAY_SIZE*Lesson::SLOT_SIZE+_day*Lesson::SLOT_SIZE+_slot]))
+					if(tossCoin(1.f/3.f))
 					{
 						mutateRoom(week, day, slot);
 					}
-					if(std::get< 2 >(randMutate[week*Lesson::DAY_SIZE*Lesson::SLOT_SIZE+_day*Lesson::SLOT_SIZE+_slot]))
+					if(tossCoin(1.f/3.f))
 					{
 						mutateLesson(week, day, slot);
 					}
