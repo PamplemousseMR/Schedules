@@ -187,7 +187,7 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 
 	for(const auto& tuple : shuffleVector(s_MAP))
 	{
-		Subject::SUBJECT_MODALITY mod = std::get< 0 >(tuple);
+		const Subject::SUBJECT_MODALITY mod = std::get< 0 >(tuple);
 		const Subject& sub = std::get< 1 >(tuple);
 		const Class& classes = std::get< 2 >(tuple);
 		int randWeek = random(0, WEEK_BY_SEMESTER);
@@ -195,10 +195,10 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 		{
 			randWeek += WEEK_BY_SEMESTER;
 		}
-		int randDay = random(0, Lesson::DAY_SIZE);
-		int randSlot = random(0, Lesson::SLOT_SIZE);
+		const Lesson::LESSON_DAY randDay = static_cast< Lesson::LESSON_DAY >(random(0, Lesson::DAY_SIZE)); 
+		const Lesson::LESSON_SLOT randSlot = static_cast< Lesson::LESSON_SLOT >(random(0, Lesson::SLOT_SIZE)); 
 
-		schedules[randWeek][static_cast< Lesson::LESSON_DAY >(randDay)][static_cast< Lesson::LESSON_SLOT >(randSlot)].emplace_back(sub, randTeacher(sub), randRoom(sub, mod), classes, mod);
+		schedules[randWeek][randDay][randSlot].emplace_back(sub, randTeacher(sub), randRoom(sub, mod), classes, mod);
 	}
 
 	Genome.m_schedules = &schedules;
@@ -210,25 +210,25 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 
 \GenomeClass::crossover:
 
-	Schedules& firstParentSchedules = *(Schedules*)parent1.m_schedules;
-	Schedules& secondParentSchedules = *(Schedules*)parent2.m_schedules;
+	const Schedules& firstParentSchedules = *(Schedules*)parent1.m_schedules;
+	const Schedules& secondParentSchedules = *(Schedules*)parent2.m_schedules;
 	delete(static_cast< Schedules* >(child.m_schedules));
 
 	Schedules* newChild = new Schedules();
 
-	bool randS1 = static_cast< bool >(random(0, 2));
-	bool randS2 = static_cast< bool >(random(0, 2));
-	bool randS3 = static_cast< bool >(random(0, 2));
-	bool randS4 = static_cast< bool >(random(0, 2));
+	const bool randS1 = static_cast< bool >(random(0, 2));
+	const bool randS2 = static_cast< bool >(random(0, 2));
+	const bool randS3 = static_cast< bool >(random(0, 2));
+	const bool randS4 = static_cast< bool >(random(0, 2));
 
 	static auto getFromSemester = [&](unsigned short _week, const Schedules& _src, Subject::SUBJECT_SEMESTER _semester)	
 	{	
 		for(unsigned short _day = 0; _day < Lesson::DAY_SIZE; ++_day)
 		{
-			Lesson::LESSON_DAY day = static_cast<Lesson::LESSON_DAY>(_day);
+			const Lesson::LESSON_DAY day = static_cast<Lesson::LESSON_DAY>(_day);
 			for(unsigned short _slot = 0; _slot < Lesson::SLOT_SIZE; ++_slot)
 			{		
-				Lesson::LESSON_SLOT slot = static_cast<Lesson::LESSON_SLOT>(_slot);
+				const Lesson::LESSON_SLOT slot = static_cast<Lesson::LESSON_SLOT>(_slot);
 				if(_src.find(_week) != _src.end() &&
 				 	_src.at(_week).find(day) != _src.at(_week).end() &&
 				 	_src.at(_week).at(day).find(slot) != _src.at(_week).at(day).end())
@@ -302,11 +302,11 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 	{	
 		std::vector< Lesson >& lessons = schedules.at(_week).at(_day).at(_slot); 
 
-		int rand = random(0, lessons.size());
+		const int rand = random(0, lessons.size());
 		const Lesson& lesson = lessons[rand];
 
-		Lesson::LESSON_DAY randDay = static_cast< Lesson::LESSON_DAY >(random(0, Lesson::DAY_SIZE)); 
-		Lesson::LESSON_SLOT randSlot = static_cast< Lesson::LESSON_SLOT >(random(0, Lesson::SLOT_SIZE)); 
+		const Lesson::LESSON_DAY randDay = static_cast< Lesson::LESSON_DAY >(random(0, Lesson::DAY_SIZE)); 
+		const Lesson::LESSON_SLOT randSlot = static_cast< Lesson::LESSON_SLOT >(random(0, Lesson::SLOT_SIZE)); 
 		int randWeek = 0;
 		switch(lesson.m_subject->m_semester)
 		{
@@ -343,17 +343,17 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
   	{ 
 		for(unsigned short _day = 0; _day < Lesson::DAY_SIZE; ++_day) 
 		{ 
-			Lesson::LESSON_DAY day = static_cast< Lesson::LESSON_DAY >(_day); 
+			const Lesson::LESSON_DAY day = static_cast< Lesson::LESSON_DAY >(_day); 
 			for(unsigned short _slot = 0; _slot < Lesson::SLOT_SIZE; ++_slot) 
 			{ 
-				Lesson::LESSON_SLOT slot = static_cast< Lesson::LESSON_SLOT >(_slot); 
+				const Lesson::LESSON_SLOT slot = static_cast< Lesson::LESSON_SLOT >(_slot); 
 				if(schedules.find(week) != schedules.end() &&
 				 	schedules.at(week).find(day) != schedules.at(week).end() &&
 				 	schedules.at(week).at(day).find(slot) != schedules.at(week).at(day).end())
 				{
 					if(tossCoin(schedules.at(week).at(day).at(slot).size()/s_MAP.size()))
 					{
-						short rand = random(0,3);
+						const short rand = random(0,3);
 						switch(rand)
 						{
 							case 0 :
@@ -391,15 +391,15 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 	{
 		for(unsigned short _day = 0; _day < Lesson::DAY_SIZE; ++_day)
 		{
-			Lesson::LESSON_DAY day = static_cast<Lesson::LESSON_DAY>(_day);
-			Teacher::TEACHERS_DAY tday = static_cast<Teacher::TEACHERS_DAY>(_day);
+			const Lesson::LESSON_DAY day = static_cast<Lesson::LESSON_DAY>(_day);
+			const Teacher::TEACHERS_DAY tday = static_cast<Teacher::TEACHERS_DAY>(_day);
 			std::map< unsigned, std::map< unsigned, unsigned > > nbCoursTeacher;
 			std::map< unsigned, std::map< unsigned, unsigned > >  nbCoursClass;
 			
 			for(unsigned short _slot = 0; _slot < Lesson::SLOT_SIZE; ++_slot)
 			{
-				Lesson::LESSON_SLOT slot = static_cast<Lesson::LESSON_SLOT>(_slot);
-				Teacher::TEACHERS_SLOT tslot = static_cast<Teacher::TEACHERS_SLOT>(_slot);
+				const Lesson::LESSON_SLOT slot = static_cast<Lesson::LESSON_SLOT>(_slot);
+				const Teacher::TEACHERS_SLOT tslot = static_cast<Teacher::TEACHERS_SLOT>(_slot);
 				int idx;
 				
 				//Tests des profs
@@ -409,7 +409,7 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 					for(const Teacher& teacher : Teacher::s_teachers.at(static_cast< Teacher::TEACHERS_TYPE >(i)))
 					{
 						++idx;
-						int count = countTeacher(teacher, (*schedules)[_week][day][slot]);
+						const int count = countTeacher(teacher, (*schedules)[_week][day][slot]);
 						if( count > 0)
 						{
 							nbCoursTeacher[idx][_slot]++;
@@ -446,14 +446,14 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 					
 					for(unsigned short _spe=0 ; _spe<Class::SPE_ALL; ++_spe)
 					{
-						Class::CLASS_SPE spe = static_cast<Class::CLASS_SPE>(_spe);
+						const Class::CLASS_SPE spe = static_cast<Class::CLASS_SPE>(_spe);
 						
 						for(unsigned short _group=0 ; _group<Class::ALL; ++_group)
 						{
 							idx++;
-							int count = countClass(std::get<2>(Class::s_classes).at(year).at(spe).at(static_cast< Class::CLASS_GROUP >(_group)), (*schedules)[_week][day][slot]) 
-									  + countClass(std::get<1>(Class::s_classes).at(year).at(spe), (*schedules)[_week][day][slot])
-									  + countClass(std::get<0>(Class::s_classes).at(year), (*schedules)[_week][day][slot]);
+							const int count = countClass(std::get<2>(Class::s_classes).at(year).at(spe).at(static_cast< Class::CLASS_GROUP >(_group)), (*schedules)[_week][day][slot]) 
+											  + countClass(std::get<1>(Class::s_classes).at(year).at(spe), (*schedules)[_week][day][slot])
+											  + countClass(std::get<0>(Class::s_classes).at(year), (*schedules)[_week][day][slot]);
 							if( count > 0)
 							{
 								nbCoursClass[idx][_slot]++;
@@ -469,7 +469,7 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 			
 			for(unsigned i=0 ; i<Teacher::s_totalTeachers ; ++i)
 			{
-				int count = nbCoursTeacher[i][Lesson::SLOT_0] + nbCoursTeacher[i][Lesson::SLOT_1] + nbCoursTeacher[i][Lesson::SLOT_2] + nbCoursTeacher[i][Lesson::SLOT_3];
+				const int count = nbCoursTeacher[i][Lesson::SLOT_0] + nbCoursTeacher[i][Lesson::SLOT_1] + nbCoursTeacher[i][Lesson::SLOT_2] + nbCoursTeacher[i][Lesson::SLOT_3];
 				if (count){
 					switch(count)
 					{
@@ -499,7 +499,7 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 			
 			for(unsigned i=0 ; i<Class::s_totalGroupes ; ++i)
 			{
-				int count = nbCoursClass[i][Lesson::SLOT_0] + nbCoursClass[i][Lesson::SLOT_1] + nbCoursClass[i][Lesson::SLOT_2] + nbCoursClass[i][Lesson::SLOT_3];
+				const int count = nbCoursClass[i][Lesson::SLOT_0] + nbCoursClass[i][Lesson::SLOT_1] + nbCoursClass[i][Lesson::SLOT_2] + nbCoursClass[i][Lesson::SLOT_3];
 				if (count > 0){
 					switch(count)
 					{
