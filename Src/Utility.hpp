@@ -101,3 +101,30 @@ int countClass(const Class& _class, const std::vector<Lesson>& _liste)
 	}
 	return result;
 }
+
+std::string dayToString(Lesson::LESSON_DAY _day)
+{
+	switch(_day)
+	{
+		case Lesson::MONDAY : return "MONDAY";
+		case Lesson::TUESDAY : return "TUESDAY";
+		case Lesson::WEDNESDAY : return "WEDNESDAY";
+		case Lesson::THURSDAY : return "THURSDAY";
+		case Lesson::FRIDAY : return "FRIDAY";
+		case Lesson::DAY_SIZE : return "";
+	}
+	return "";
+}
+
+std::string slotToString(Lesson::LESSON_SLOT _slot)
+{
+	switch(_slot)
+	{
+		case Lesson::SLOT_0 : return "8h30-10h00";
+		case Lesson::SLOT_1 : return "10h15-11h45";
+		case Lesson::SLOT_2 : return "12h45-14h15";
+		case Lesson::SLOT_3 : return "14h30-16h";
+		case Lesson::SLOT_SIZE : return "";
+	}
+	return "";
+}

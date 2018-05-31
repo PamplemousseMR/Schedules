@@ -177,20 +177,135 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 \GenomeClass::display:
 
   	Schedules& schedules = (*(Schedules*)Genome.m_schedules); 
-
+	std::string separateur("------------------------------------------------------------"); 
+	
+	//affichage des crénaux 
+	std::cout << std::endl << separateur << std::endl;
 	for(unsigned short _week = 0; _week < WEEK_BY_SEMESTER*2 ; ++_week)
 	{
 		for(unsigned short _day = 0; _day < Lesson::DAY_SIZE; ++_day)
 		{
 			const Lesson::LESSON_DAY day = static_cast<Lesson::LESSON_DAY>(_day);
+			std::string dayS = dayToString(day);
 			for(unsigned short _slot = 0; _slot < Lesson::SLOT_SIZE; ++_slot)
 			{		
-				std::cout << "Week : " << _week << " Day : "<< _day << " Slot : " << _slot << std::endl;
 				const Lesson::LESSON_SLOT slot = static_cast<Lesson::LESSON_SLOT>(_slot);
+				std::cout << "Week " << _week << " " << dayS << " " << slotToString(slot) << std::endl;
 				for(const Lesson& les: schedules[_week][day][slot])
 				{
 					std::cout << les << std::endl;
 				}
+				std::cout << std::endl;
+			}
+		}
+	}
+	
+	std::map< unsigned, float > nbTotalTeacher;
+	std::map< unsigned, float > nbTotalClass;
+	std::map< unsigned, float > nbTotalRoom;
+	
+	for(unsigned short _week = 0; _week < WEEK_BY_SEMESTER*2; ++_week)
+	{
+		for(unsigned short _day = 0; _day < Lesson::DAY_SIZE; ++_day)
+		{
+			const Lesson::LESSON_DAY day = static_cast<Lesson::LESSON_DAY>(_day);
+			
+			for(unsigned short _slot = 0; _slot < Lesson::SLOT_SIZE; ++_slot)
+			{
+				const Lesson::LESSON_SLOT slot = static_cast<Lesson::LESSON_SLOT>(_slot);
+				int idx;
+				
+				idx = 0;
+				for(unsigned i=0 ; i<Teacher::TYPE_SIZE ; ++i)
+				{
+					for(const Teacher& teacher : Teacher::s_teachers.at(static_cast< Teacher::TEACHERS_TYPE >(i)))
+					{
+						++idx;
+						if(countTeacher(teacher, schedules[_week][day][slot]) > 0)
+						{
+							nbTotalTeacher[idx] += Lesson::SLOT_INTERVAL;
+						}
+					}
+				}
+				
+				idx = 0;
+				for(unsigned i=0 ; i<Room::TYPE_SIZE ; ++i)
+				{
+					for(const Room& room : Room::s_rooms.at(static_cast< Room::ROOM_TYPE >(i)))
+					{
+						++idx;
+						if(countRoom(room, schedules[_week][day][slot]) > 0)
+						{
+							nbTotalRoom[idx] += Lesson::SLOT_INTERVAL;
+						}
+					}
+				}
+				
+				idx = 0 ;
+				for(unsigned short _year=0 ; _year<Class::YEAR_SIZE; ++_year)
+				{
+					Class::CLASS_YEAR year = static_cast<Class::CLASS_YEAR>(_year);
+					
+					for(unsigned short _spe=0 ; _spe<Class::SPE_ALL; ++_spe)
+					{
+						const Class::CLASS_SPE spe = static_cast<Class::CLASS_SPE>(_spe);
+						
+						for(unsigned short _group=0 ; _group<Class::ALL; ++_group)
+						{
+							idx++;
+							const int count = countClass(std::get<2>(Class::s_classes).at(year).at(spe).at(static_cast< Class::CLASS_GROUP >(_group)), schedules[_week][day][slot]) 
+											  + countClass(std::get<1>(Class::s_classes).at(year).at(spe), schedules[_week][day][slot])
+											  + countClass(std::get<0>(Class::s_classes).at(year), schedules[_week][day][slot]);
+							if( count > 0)
+							{
+								nbTotalClass[idx] += Lesson::SLOT_INTERVAL;
+							}
+						}
+					}
+				}
+				
+			}
+		}
+	}
+	
+	int idx;
+	
+	idx = 0;
+	std::cout << std::endl << separateur << std::endl << "-----   Teacher working time   -----" << std::endl << separateur << std::endl;
+	for(unsigned i=0 ; i<Teacher::TYPE_SIZE ; ++i)
+	{
+		for(const Teacher& teacher : Teacher::s_teachers.at(static_cast< Teacher::TEACHERS_TYPE >(i)))
+		{
+			++idx;
+			std::cout << " - " << teacher << " : " << nbTotalTeacher[idx] << "H" << std::endl;
+		}
+	}
+	
+	idx = 0;
+	std::cout << std::endl << separateur << std::endl << "-----   Class occuped time   -----" << std::endl << separateur << std::endl;
+	for(unsigned i=0 ; i<Room::TYPE_SIZE ; ++i)
+	{
+		for(const Room& room : Room::s_rooms.at(static_cast< Room::ROOM_TYPE >(i)))
+		{
+			++idx;
+			std::cout << " - " << room << " : " << nbTotalRoom[idx] << "H" << std::endl;
+		}
+	}
+	
+	idx = 0 ;
+	std::cout << std::endl << separateur << std::endl << "-----   Student study time   -----" << std::endl << separateur << std::endl;
+	for(unsigned short _year=0 ; _year<Class::YEAR_SIZE; ++_year)
+	{
+		Class::CLASS_YEAR year = static_cast<Class::CLASS_YEAR>(_year);
+		
+		for(unsigned short _spe=0 ; _spe<Class::SPE_ALL; ++_spe)
+		{
+			const Class::CLASS_SPE spe = static_cast<Class::CLASS_SPE>(_spe);
+			
+			for(unsigned short _group=0 ; _group<Class::ALL; ++_group)
+			{
+				idx++;
+				std::cout << " - " << std::get<2>(Class::s_classes).at(year).at(spe).at(static_cast< Class::CLASS_GROUP >(_group)) << " : " << nbTotalRoom[idx] << "H" << std::endl;
 			}
 		}
 	}
@@ -640,10 +755,10 @@ static const unsigned short s_WEAK_CONSTRAINT = 1;
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
 \Default run parameters :         // Please let the parameters appear in this order
-Number of generations : 30000     // NB_GEN
+Number of generations : 300     // NB_GEN
 Time limit: 0                     // In seconds, 0 to deactivate
-Population size : 100             // POP_SIZE
-Offspring size : 100%             // 40% 
+Population size : 1000             // POP_SIZE
+Offspring size : 90%             // 40% 
 Mutation probability : 0.4        // MUT_PROB
 Crossover probability : 1         // XOVER_PROB
 Evaluator goal : minimise         // Maximise
