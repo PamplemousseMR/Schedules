@@ -14,7 +14,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 - [easea](http://easea.unistra.fr/index.php/EASEA_platform) : An Artificial Evolution platform that allows to implement evolutionary algorithms and to exploit the massive parallelism of many-core architectures.
 
-### compilation
+### Compilation
 
 Generate the project by using easea : `./easea schedules.ez`.
 
@@ -26,7 +26,7 @@ Compile using the makefile : `make`.
 - clear : Clean previous compilation.
 ```
 
-### use
+### Use
 
 Start the program  : `./schedules`.
 
