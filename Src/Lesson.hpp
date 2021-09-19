@@ -50,7 +50,7 @@ public:
 	
 	const Class* m_class;
 	
-	const Subject::SUBJECT_MODALITY m_modality;
+	Subject::SUBJECT_MODALITY m_modality;
 
 public:
 

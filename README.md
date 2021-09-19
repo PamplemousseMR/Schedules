@@ -2,9 +2,10 @@
 
 The goal of this project is to write a program that generates schedules with a genetic algorithm.
 
-## Travis
+## CI
 
-[![Build Status](https://travis-ci.com/PamplemousseMR/Schedules.svg?branch=master)](https://travis-ci.com/PamplemousseMR/Schedules)
+![Build Status](https://github.com/PamplemousseMR/Schedules/actions/workflows/build.yml/badge.svg)
+
 
 ## Getting Started
 

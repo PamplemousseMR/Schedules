@@ -1,0 +1,53 @@
+name: Build
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.OS }}
+
+    strategy:
+      matrix:
+        name: [ubuntu_18-04_gcc5]
+        include:
+        - name: ubuntu_18-04_gcc5
+          OS: ubuntu-18.04
+          COMPILER: gcc-5
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Package
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+              sudo apt-get update
+              sudo apt-get --assume-yes install bison flex
+              sudo apt-get --assume-yes install ${{ matrix.COMPILER }}
+          elif [ "$RUNNER_OS" == "Windows" ]; then
+              echo "$RUNNER_OS not supported"
+              exit 1
+          else
+              echo "$RUNNER_OS not supported"
+              exit 1
+          fi
+
+      - name: Easea
+        run: |
+          git clone https://github.com/EASEA/easea.git
+          cd easea
+          git checkout v1.0.3
+          make
+          ./install.sh local
+          export EZ_PATH=$HOME/project/easea/
+          cd ..
+
+      - name: Build
+        run: |
+          export CXX=${{ matrix.COMPILER }}
+          ./easea/bin/easea schedules.ez
+          chmod 777 ./hack.sh
+          ./hack.sh
+          make
+          make clean
